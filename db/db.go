@@ -12,7 +12,7 @@ import (
 // TODO move variables to config file
 const connStr = "mongodb://localhost:27017"
 
-var Client *mongo.Client
+var Client *mongo.Client = ConnectDB()
 
 // ConnectDB is a function to open connection with database
 func ConnectDB() *mongo.Client {
@@ -28,7 +28,7 @@ func ConnectDB() *mongo.Client {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// defer Client.Disconnect(ctx)
+	//defer client.Disconnect(ctx)
 
 	// Ping the database
 	err = client.Ping(ctx, nil)
@@ -36,13 +36,14 @@ func ConnectDB() *mongo.Client {
 		log.Fatal(err)
 	}
 	fmt.Println("Connected to mongodb")
+
 	return client
 }
 
 // OpenCollection is a function to make connection with database and open collection
 func OpenCollection(client *mongo.Client, collectionName string) *mongo.Collection {
 	// Get specified collection from database
-	collection := client.Database("cluster0").Collection(collectionName)
+	collection := client.Database("bananzaDB").Collection(collectionName)
 
 	return collection
 }

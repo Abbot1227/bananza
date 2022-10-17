@@ -1,11 +1,9 @@
 package main
 
 import (
-	"Bananza/db"
 	"Bananza/routes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"log"
 )
 
 // @title TODO App API
@@ -22,11 +20,10 @@ import (
 var router *gin.Engine
 
 func main() {
-	db.Client = db.ConnectDB()
-	srv := new(Server)
+	/*srv := new(Server)
 	if err := srv.Run("8080"); err != nil {
 		log.Fatal(err)
-	}
+	}*/
 
 	router = gin.New()
 	router.Use(gin.Logger())
@@ -36,6 +33,7 @@ func main() {
 	user := router.Group("/user")
 	{
 		user.POST("/login", routes.AuthenticateUser)
+		user.GET("/", routes.UserProfile)
 	}
 
 	router.Run(":8080")
