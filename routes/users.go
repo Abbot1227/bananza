@@ -4,6 +4,7 @@ import (
 	"Bananza/db"
 	"Bananza/models"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -13,6 +14,7 @@ import (
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/oauth2/v1"
 	"google.golang.org/api/option"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
@@ -40,70 +42,99 @@ func AuthenticateUser(c *gin.Context) {
 		return
 	}
 
-	if err := validateToken(ctx, token.Token); err != nil {
-		// If there is no user create new one
-		if err == mongo.ErrNoDocuments {
-			// Getting user google account info from Google api
-			userInfo, err := getUserInfo(token.Token)
-			if err != nil {
-				fmt.Println(err.Error())
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			}
-
-			// Вынести модель юзера в общую зону и внутри валидации токена добавлять данные в неё
-			user := models.User{ID: primitive.NewObjectID(),
-				Email:     userInfo.Email,
-				Name:      userInfo.Name,
-				FirstName: userInfo.GivenName,
-				LastName:  userInfo.FamilyName,
-				UserId:    userInfo.Id,
-				AvatarURL: userInfo.Picture,
-			}
-
-			// Inserting new user into database
-			result, insertErr := usersCollection.InsertOne(ctx, &user)
-			if insertErr != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "user was not created"})
-				fmt.Println(insertErr)
-				return
-			}
-
-			c.JSON(http.StatusOK, result)
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	defer cancel()
-
-	// Return message "user exists" if user exists
-	c.JSON(http.StatusOK, gin.H{"user-status": "already exists"})
-}
-
-// Просто проверка работы базы данных
-// UserProfile is a function TODO returns users information
-func UserProfile(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
-
-	filter := bson.D{{"userId", "1234567810"}}
 	var user models.User
 
-	if err := usersCollection.FindOne(ctx, filter).Decode(&user); err != nil {
+	if err := validateToken(ctx, token.Token, &user); err != nil {
+		// If there is no user create new one
 		if err != mongo.ErrNoDocuments {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusNotFound, gin.H{"error": "the requested user was not found"})
+
+		// Getting user google account info from Google api
+		userInfo, err := getUserInfo(token.Token)
+		if err != nil {
+			fmt.Println(err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+
+		// Assigning userInfo fields to user fields
+		{
+			user.ID = primitive.NewObjectID()
+			user.Name = userInfo.Name
+			user.FirstName = userInfo.GivenName
+			user.LastName = userInfo.FamilyName
+			user.UserId = userInfo.Id
+			user.AvatarURL = userInfo.Picture
+		}
+
+		// Inserting new user into database
+		result, insertErr := usersCollection.InsertOne(ctx, &user)
+		if insertErr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "user was not created"})
+			fmt.Println(insertErr)
+			return
+		}
+
+		// Return result of created user
+		c.JSON(http.StatusOK, result)
 		return
 	}
 	defer cancel()
 
-	// Return user with given user id
+	// Return user info
+	c.JSON(http.StatusOK, user)
+}
+
+// UserProfiles is a function TODO add description
+func UserProfiles(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+
+	var users []models.User
+
+	cursor, err := usersCollection.Find(ctx, bson.M{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+
+	if err = cursor.All(ctx, &users); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+	defer cancel()
+
+	fmt.Println(users)
+
+	c.JSON(http.StatusOK, users)
+}
+
+// UserProfile is a function TODO returns users information
+func UserProfile(c *gin.Context) {
+	userID := c.Params.ByName("id")
+	docID, _ := primitive.ObjectIDFromHex(userID)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+
+	filter := bson.D{{"_id", docID}}
+	var user models.User
+
+	if err := usersCollection.FindOne(ctx, filter).Decode(&user); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+	defer cancel()
+
+	fmt.Println(user)
+
 	c.JSON(http.StatusOK, user)
 }
 
 // validateToken is a function TODO add description
-func validateToken(ctx context.Context, token string) error {
+func validateToken(ctx context.Context, token string, user *models.User) error {
 	userInfo, err := getUserInfo(token)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -113,11 +144,10 @@ func validateToken(ctx context.Context, token string) error {
 
 	// Filter to find user with specified Google ID in users collection
 	filter := bson.D{{"userId", userId}}
-	var user bson.M // To store user's info in mongodb object
 
 	// Obtain user info from users collection and store it in user object
 	// if not found return error otherwise return nil
-	if err = usersCollection.FindOne(ctx, filter).Decode(&user); err != nil {
+	if err = usersCollection.FindOne(ctx, filter).Decode(user); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return err
 		}
@@ -142,4 +172,39 @@ func getUserInfo(token string) (*oauth2.Userinfoplus, error) {
 		return nil, e
 	}
 	return userInfo, nil
+}
+
+// Подумать над интеграцией с Мирасом
+// Сделать рефакторинг
+
+// Запасной вариант
+
+type UserInfo struct {
+	Sub           string `json:"sub"`
+	Name          string `json:"name"`
+	GivenName     string `json:"given_name"`
+	FamilyName    string `json:"family_name"`
+	Profile       string `json:"profile"`
+	Picture       string `json:"picture"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
+	Gender        string `json:"gender"`
+}
+
+func getGoogleUserInfo(token string) (*UserInfo, error) {
+	client := http.Client{Timeout: time.Second * 30}
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo?access_token=" + token)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var result UserInfo
+	if err := json.Unmarshal(data, &result); err != nil {
+		return nil, err
+	}
+	return &result, nil
 }

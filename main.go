@@ -30,11 +30,20 @@ func main() {
 	router.Use(cors.Default())
 
 	// user endpoint
-	user := router.Group("/user")
+	user := router.Group("/users")
 	{
-		user.POST("/login", routes.AuthenticateUser)
-		user.GET("/", routes.UserProfile)
+		// C
+		user.POST("/login", routes.AuthenticateUser) // Done
+		user.POST("/progress", routes.AddLanguage)   // Test add middlewares check if language exists and user exists or not
+		// R
+		user.GET("/", routes.UserProfiles)             // Done add middlewares authorization only admin
+		user.GET("/:id", routes.UserProfile)           // Done authorization only admin
+		user.GET("/progress/:id", routes.UserProgress) // Test add middlewares authorization only admin
+		// U
+		user.PUT("/progress", routes.UpdateProgress) // Test add middlewares check if exists
 	}
 
 	router.Run(":8080")
 }
+
+// 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

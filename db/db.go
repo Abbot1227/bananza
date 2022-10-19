@@ -3,16 +3,30 @@ package db
 import (
 	"context"
 	"fmt"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"os"
 	"time"
 )
 
 // TODO move variables to config file
-const connStr = "mongodb://localhost:27017"
+var username, password = getDBConfig()
+var connStr = "mongodb+srv://" + username + ":" + password + "@cluster0.9rrlh4n.mongodb.net/?retryWrites=true&w=majority"
 
-var Client *mongo.Client = ConnectDB()
+var Client = ConnectDB()
+
+// getDBConfig is a function used to get username and password for mongdodb connection
+func getDBConfig() (string, string) {
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	return os.Getenv("MONGODB_NICKNAME"), os.Getenv("MONGODB_PASSWORD")
+}
 
 // ConnectDB is a function to open connection with database
 func ConnectDB() *mongo.Client {
@@ -43,7 +57,7 @@ func ConnectDB() *mongo.Client {
 // OpenCollection is a function to make connection with database and open collection
 func OpenCollection(client *mongo.Client, collectionName string) *mongo.Collection {
 	// Get specified collection from database
-	collection := client.Database("bananzaDB").Collection(collectionName)
+	collection := client.Database("bananza").Collection(collectionName)
 
 	return collection
 }

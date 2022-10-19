@@ -18,3 +18,8 @@ type UserProgress struct {
 	Level    int                `json:"level"`
 	User     primitive.ObjectID `bson:"user"`
 }
+
+type InputLanguage struct {
+	Language string `json:"language"`
+	User     string `json:"user"`
+}
