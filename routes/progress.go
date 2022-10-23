@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 	"time"
@@ -52,7 +53,31 @@ func AddLanguage(c *gin.Context) {
 
 // UserProgress is a function
 func UserProgress(c *gin.Context) {
+	userID := c.Params.ByName("id")
+	user, _ := primitive.ObjectIDFromHex(userID[3:])
 
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+
+	filter := bson.D{{"user", user}}
+	var userProgress []models.UserProgress
+
+	cursor, err := userProgressCollection.Find(ctx, filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+
+	if err = cursor.All(ctx, &userProgress); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+	defer cancel()
+
+	fmt.Println(user)
+
+	c.JSON(http.StatusOK, userProgress)
 }
 
 // UpdateProgress is a function

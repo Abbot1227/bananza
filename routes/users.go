@@ -61,6 +61,7 @@ func AuthenticateUser(c *gin.Context) {
 		// Assigning userInfo fields to user fields
 		{
 			user.ID = primitive.NewObjectID()
+			user.Email = userInfo.Email
 			user.Name = userInfo.Name
 			user.FirstName = userInfo.GivenName
 			user.LastName = userInfo.FamilyName
@@ -76,14 +77,31 @@ func AuthenticateUser(c *gin.Context) {
 			return
 		}
 
-		// Return result of created user
+		// Return result of existing user
 		c.JSON(http.StatusOK, result)
 		return
 	}
 	defer cancel()
 
+	// TODO вынести в отдельную функцию
+	filter := bson.D{{"user", user.ID}}
+	var userProgress []models.UserProgress
+
+	cursor, err := userProgressCollection.Find(ctx, filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+
+	if err = cursor.All(ctx, &userProgress); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+
 	// Return user info
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, gin.H{"user": user, "language": userProgress})
 }
 
 // UserProfiles is a function TODO add description
@@ -114,7 +132,7 @@ func UserProfiles(c *gin.Context) {
 // UserProfile is a function TODO returns users information
 func UserProfile(c *gin.Context) {
 	userID := c.Params.ByName("id")
-	docID, _ := primitive.ObjectIDFromHex(userID)
+	docID, _ := primitive.ObjectIDFromHex(userID[3:])
 
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
@@ -143,7 +161,7 @@ func validateToken(ctx context.Context, token string, user *models.User) error {
 	userId := userInfo.Id
 
 	// Filter to find user with specified Google ID in users collection
-	filter := bson.D{{"userId", userId}}
+	filter := bson.D{{"userid", userId}}
 
 	// Obtain user info from users collection and store it in user object
 	// if not found return error otherwise return nil
