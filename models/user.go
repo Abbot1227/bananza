@@ -24,3 +24,6 @@ type InputLanguage struct {
 	Language string `json:"language"`
 	User     string `json:"user"`
 }
+
+type LanguageUpdate struct {
+}

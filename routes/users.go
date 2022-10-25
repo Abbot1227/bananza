@@ -27,27 +27,30 @@ var usersCollection = db.OpenCollection(db.Client, "users")
 func AuthenticateUser(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
-	var token models.AuthToken // TODO change maybe
+	var token models.AuthToken
 
 	if err := c.BindJSON(&token); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		fmt.Println(err)
+		defer cancel()
 		return
 	}
 
 	// Ensure that data we receive is correct
-	validationErr := validate.Struct(token)
+	validationErr := validate.Struct(&token)
 	if validationErr != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+		defer cancel()
 		return
 	}
 
-	var user models.User
+	var user models.User // TODO change maybe
 
 	if err := validateToken(ctx, token.Token, &user); err != nil {
 		// If there is no user create new one
 		if err != mongo.ErrNoDocuments {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			defer cancel()
 			return
 		}
 
@@ -74,8 +77,10 @@ func AuthenticateUser(c *gin.Context) {
 		if insertErr != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "user was not created"})
 			fmt.Println(insertErr)
+			defer cancel()
 			return
 		}
+		defer cancel()
 
 		// Return result of existing user
 		c.JSON(http.StatusOK, result)
@@ -84,24 +89,24 @@ func AuthenticateUser(c *gin.Context) {
 	defer cancel()
 
 	// TODO вынести в отдельную функцию
-	filter := bson.D{{"user", user.ID}}
-	var userProgress []models.UserProgress
-
-	cursor, err := userProgressCollection.Find(ctx, filter)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		fmt.Println(err)
-		return
+	filter := bson.D{
+		{"$and",
+			bson.A{
+				bson.D{{"user", user.ID}},
+				bson.D{{"language", user.LastLanguage}},
+			},
+		},
 	}
+	var lastLanguageProgress models.UserProgress
 
-	if err = cursor.All(ctx, &userProgress); err != nil {
+	if err := userProgressCollection.FindOne(ctx, filter).Decode(&lastLanguageProgress); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		fmt.Println(err)
 		return
 	}
 
 	// Return user info
-	c.JSON(http.StatusOK, gin.H{"user": user, "language": userProgress})
+	c.JSON(http.StatusOK, gin.H{"user": user, "last_language": lastLanguageProgress})
 }
 
 // UserProfiles is a function TODO add description
@@ -114,12 +119,14 @@ func UserProfiles(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		fmt.Println(err)
+		defer cancel()
 		return
 	}
 
 	if err = cursor.All(ctx, &users); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		fmt.Println(err)
+		defer cancel()
 		return
 	}
 	defer cancel()
@@ -142,6 +149,7 @@ func UserProfile(c *gin.Context) {
 	if err := usersCollection.FindOne(ctx, filter).Decode(&user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		fmt.Println(err)
+		defer cancel()
 		return
 	}
 	defer cancel()
