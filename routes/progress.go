@@ -65,17 +65,13 @@ func AddLanguage(c *gin.Context) {
 
 // UserProgress is a function
 func UserProgress(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+
 	userID := c.Query("id")
 	language := c.Query("language")
 	user, _ := primitive.ObjectIDFromHex(userID)
-	//userID := c.Params.ByName("id")
-	//language := c.Params.ByName("language")
-	//user, _ := primitive.ObjectIDFromHex(userID[3:])
-	//language = language[9:]
 
 	fmt.Println(userID + " " + language)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
 	filter := bson.D{
 		{"$and",
@@ -101,5 +97,10 @@ func UserProgress(c *gin.Context) {
 
 // UpdateProgress is a function
 func UpdateProgress(c *gin.Context) {
-
+	//ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 }
+
+// Update progress
+// Get audio file from user endpoint
+// Do refactoring
+// Set exercises model
