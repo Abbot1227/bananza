@@ -1,14 +1,13 @@
 FROM golang:latest
 
-WORKDIR /banannza
+COPY . /bananza
 
-COPY go.mod ./
-COPY go.sum ./
+WORKDIR /bananza
 
 RUN go mod download
 
-COPY *.go ./
-
 RUN go build -o main .
 
-CMD [ "/bananza" ]
+EXPOSE 8080
+
+CMD [ "go", "run", "main.go" ]
