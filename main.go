@@ -34,6 +34,11 @@ func main() {
 	// CORS configuration
 	router.Use(cors.Default())
 
+	// Testing docker purpose only
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"health": "docker test"})
+	})
+
 	// user endpoint
 	user := router.Group("/users")
 	{
@@ -51,7 +56,7 @@ func main() {
 
 	exercise := router.Group("/exercises")
 	{
-		exercise.POST("/mic", routes.MicroShit) // Test
+		exercise.POST("/mic", routes.LoadAudio) // Test
 	}
 
 	r2 := gin.Default()

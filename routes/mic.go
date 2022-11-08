@@ -14,7 +14,7 @@ import (
 
 var client = &http.Client{}
 
-func MicroShit(c *gin.Context) {
+func LoadAudio(c *gin.Context) {
 	_, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
 	// the FormFile function takes in the POST input id file
@@ -30,20 +30,24 @@ func MicroShit(c *gin.Context) {
 
 	defer cancel()
 
+	// TODO remove temp structure
+	var temp map[string]interface{}
+	language := "de"
+
 	// Forwarding file to AI part
-	if err = sendPostRequest(file); err != nil {
+	if err = sendPostRequest(file, &temp, language); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": "file uploaded successfully"})
+	c.JSON(http.StatusOK, gin.H{"text": temp["text"]})
 }
 
-func sendPostRequest(file multipart.File) error {
+func sendPostRequest(file multipart.File, temp *map[string]interface{}, language string) error {
 	b := &bytes.Buffer{}
 	w := multipart.NewWriter(b)
 
-	filename := createAudioFilename()
+	filename := createAudioFilename(language)
 	fw, err := w.CreateFormFile("uploaded_file", filename)
 	if err != nil {
 		return err
@@ -68,9 +72,6 @@ func sendPostRequest(file multipart.File) error {
 	}
 	defer res.Body.Close()
 
-	// TODO remove temp structure
-	var temp map[string]interface{}
-
 	cnt, err := io.ReadAll(res.Body)
 	if err != nil {
 		return err
@@ -80,13 +81,13 @@ func sendPostRequest(file multipart.File) error {
 		fmt.Println("wrong request")
 		return err
 	}
-	fmt.Println(temp["text"])
 
 	return nil
 }
 
 // createAudioFilename is a function to generate audio file name
-func createAudioFilename() string {
-	filename := "audio" + time.Now().Format("01022006150405") + ".mp3"
+func createAudioFilename(language string) string {
+	// language - de, ru, kr
+	filename := language + "_audio" + time.Now().Format("01022006150405") + ".mp3"
 	return filename
 }
