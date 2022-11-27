@@ -168,16 +168,16 @@ func UserProfile(c *gin.Context) {
 }
 
 func SetLastLanguage(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
-
-	var lastLanguage models.LastLanguageUpdate
-
-	if err := c.BindJSON(&lastLanguage); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		fmt.Println(err)
-		defer cancel()
-		return
-	}
+	//ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	//
+	//var lastLanguage models.LastLanguageUpdate
+	//
+	//if err := c.BindJSON(&lastLanguage); err != nil {
+	//	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	//	fmt.Println(err)
+	//	defer cancel()
+	//	return
+	//}
 }
 
 // validateToken is a function TODO add description
