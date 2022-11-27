@@ -163,7 +163,7 @@ func UserProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func SetFirstLanguage(c *gin.Context) {
+func SetLastLanguage(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
 	var lastLanguage models.LastLanguageUpdate
@@ -197,21 +197,40 @@ func SetFirstLanguage(c *gin.Context) {
 
 	userID, _ := primitive.ObjectIDFromHex(lastLanguage.ID)
 
-	newUserProgress := models.UserProgress{ID: primitive.NewObjectID(),
-		Language: lastLanguage.LastLanguage,
-		Level:    0,
-		User:     userID}
+	filter := bson.D{
+		{"$and",
+			bson.A{
+				bson.D{{"user", userID}},
+				bson.D{{"language", lastLanguage.LastLanguage}},
+			},
+		},
+	}
+	var languageProgress models.UserProgress
 
-	insertResult, insertErr := userProgressCollection.InsertOne(ctx, &newUserProgress)
-	if insertErr != nil {
+	if err := userProgressCollection.FindOne(ctx, filter).Decode(&languageProgress); err != nil {
+		if err == mongo.ErrNoDocuments {
+			newUserProgress := models.UserProgress{ID: primitive.NewObjectID(),
+				Language: lastLanguage.LastLanguage,
+				Level:    0,
+				User:     userID}
+
+			insertResult, insertErr := userProgressCollection.InsertOne(ctx, &newUserProgress)
+			if insertErr != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				defer cancel()
+			}
+			defer cancel()
+			fmt.Println(insertResult)
+
+			c.JSON(http.StatusOK, newUserProgress)
+			return
+		}
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		defer cancel()
+		fmt.Println(err)
 	}
 	defer cancel()
-	fmt.Println(insertResult)
 
-	c.JSON(http.StatusOK, newUserProgress)
-
+	c.JSON(http.StatusOK, languageProgress)
 }
 
 // validateToken is a function TODO add description

@@ -55,6 +55,20 @@ func AddLanguage(c *gin.Context) {
 		fmt.Println(insertErr)
 		return
 	}
+
+	// Set new last language
+	update := bson.D{{
+		"$set", bson.D{
+			{"lastlanguage", inputLanguage.Language},
+		},
+	}}
+
+	_, err := usersCollection.UpdateByID(ctx, inputLanguage.User, update)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		defer cancel()
+	}
+
 	defer cancel()
 
 	// Return result of existing user
