@@ -177,6 +177,7 @@ func SetLastLanguage(c *gin.Context) {
 	fmt.Println(lastLanguage)
 	if lastLanguage.ID == "0" && lastLanguage.LastLanguage == "0" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "try again"})
+		return
 	}
 
 	// Ensure that data we receive is correct
