@@ -48,7 +48,7 @@ func main() {
 		user.GET("/progress", routes.UserProgress) // Done add middlewares authorization only admin проверить что только юзер с тем id может запрашивать свои
 		// U
 		user.PUT("/progress", routes.UpdateProgress) // Test add middlewares check if exists
-		user.PUT("/lastlanguage", routes.SetLastLanguage)
+		user.PUT("/firstlang", routes.SetFirstLanguage)
 		// TODO delete progress and-or user
 	}
 

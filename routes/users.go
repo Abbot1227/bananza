@@ -42,8 +42,6 @@ func AuthenticateUser(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(token)
-
 	var user models.User // TODO change maybe
 
 	if err := validateToken(ctx, token.Token, &user); err != nil {
@@ -72,7 +70,6 @@ func AuthenticateUser(c *gin.Context) {
 			user.AvatarURL = userInfo.Picture
 			user.LastLanguage = "" // TODO change
 		}
-		fmt.Println(user)
 
 		// Inserting new user into database
 		result, insertErr := usersCollection.InsertOne(ctx, &user)
@@ -111,7 +108,6 @@ func AuthenticateUser(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(user)
 
 	// Return user info
 	c.JSON(http.StatusOK, gin.H{"user": user, "last_language": lastLanguageProgress})
@@ -167,17 +163,55 @@ func UserProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func SetLastLanguage(c *gin.Context) {
-	//ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
-	//
-	//var lastLanguage models.LastLanguageUpdate
-	//
-	//if err := c.BindJSON(&lastLanguage); err != nil {
-	//	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	//	fmt.Println(err)
-	//	defer cancel()
-	//	return
-	//}
+func SetFirstLanguage(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+
+	var lastLanguage models.LastLanguageUpdate
+
+	if err := c.BindJSON(&lastLanguage); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+
+	// Ensure that data we receive is correct
+	validationErr := validate.Struct(&lastLanguage)
+	if validationErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+		defer cancel()
+		return
+	}
+
+	update := bson.D{{
+		"$set", bson.D{
+			{"lastlanguage", lastLanguage.LastLanguage},
+		},
+	}}
+
+	_, err := usersCollection.UpdateByID(ctx, lastLanguage.ID, update)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		defer cancel()
+	}
+
+	userID, _ := primitive.ObjectIDFromHex(lastLanguage.ID)
+
+	newUserProgress := models.UserProgress{ID: primitive.NewObjectID(),
+		Language: lastLanguage.LastLanguage,
+		Level:    0,
+		User:     userID}
+
+	insertResult, insertErr := userProgressCollection.InsertOne(ctx, &newUserProgress)
+	if insertErr != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		defer cancel()
+	}
+	defer cancel()
+	fmt.Println(insertResult)
+
+	c.JSON(http.StatusOK, newUserProgress)
+
 }
 
 // validateToken is a function TODO add description
