@@ -175,7 +175,7 @@ func SetLastLanguage(c *gin.Context) {
 		return
 	}
 	fmt.Println(lastLanguage)
-	if lastLanguage.ID == "" && lastLanguage.LastLanguage == "" {
+	if lastLanguage.ID == "0" && lastLanguage.LastLanguage == "0" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "try again"})
 	}
 
@@ -234,6 +234,7 @@ func SetLastLanguage(c *gin.Context) {
 		fmt.Println(err)
 	}
 	defer cancel()
+	fmt.Println(languageProgress)
 
 	c.JSON(http.StatusOK, languageProgress)
 }
