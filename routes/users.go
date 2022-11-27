@@ -174,6 +174,7 @@ func SetLastLanguage(c *gin.Context) {
 		defer cancel()
 		return
 	}
+	fmt.Println(lastLanguage)
 
 	// Ensure that data we receive is correct
 	validationErr := validate.Struct(&lastLanguage)
@@ -183,19 +184,20 @@ func SetLastLanguage(c *gin.Context) {
 		return
 	}
 
-	update := bson.D{{
-		"$set", bson.D{
-			{"lastlanguage", lastLanguage.LastLanguage},
+	update := bson.D{
+		{"$set",
+			bson.D{
+				{"lastlanguage", lastLanguage.LastLanguage},
+			},
 		},
-	}}
+	}
+	userID, _ := primitive.ObjectIDFromHex(lastLanguage.ID)
 
-	_, err := usersCollection.UpdateByID(ctx, lastLanguage.ID, update)
+	_, err := usersCollection.UpdateByID(ctx, userID, update)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		defer cancel()
 	}
-
-	userID, _ := primitive.ObjectIDFromHex(lastLanguage.ID)
 
 	filter := bson.D{
 		{"$and",
