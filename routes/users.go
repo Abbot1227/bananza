@@ -42,6 +42,8 @@ func AuthenticateUser(c *gin.Context) {
 		return
 	}
 
+	fmt.Println(token)
+
 	var user models.User // TODO change maybe
 
 	if err := validateToken(ctx, token.Token, &user); err != nil {
@@ -70,6 +72,7 @@ func AuthenticateUser(c *gin.Context) {
 			user.AvatarURL = userInfo.Picture
 			user.LastLanguage = "" // TODO change
 		}
+		fmt.Println(user)
 
 		// Inserting new user into database
 		result, insertErr := usersCollection.InsertOne(ctx, &user)
@@ -103,6 +106,7 @@ func AuthenticateUser(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
+	fmt.Println(user)
 
 	// Return user info
 	c.JSON(http.StatusOK, gin.H{"user": user, "last_language": lastLanguageProgress})
@@ -156,6 +160,10 @@ func UserProfile(c *gin.Context) {
 	fmt.Println(user)
 
 	c.JSON(http.StatusOK, user)
+}
+
+func SetLastLanguage(c *gin.Context) {
+
 }
 
 // validateToken is a function TODO add description
