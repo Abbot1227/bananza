@@ -1,16 +1,19 @@
 package service
 
-type Authorization interface {
-}
+import (
+	"Bananza/models"
+	"context"
+)
 
-type Progress interface {
+type Authorization interface {
+	ValidateToken(ctx context.Context, token models.AuthToken) (*models.User, error)
+	AuthenticateUser(user models.User) error
 }
 
 type Service struct {
 	Authorization
-	Progress
 }
 
-func NewService() *Service {
-	return &Service{}
-}
+//func NewService() *Service {
+//	return &Service{Authorization: NewAuthService()}
+//}

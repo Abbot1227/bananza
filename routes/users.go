@@ -4,7 +4,6 @@ import (
 	"Bananza/db"
 	"Bananza/models"
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -14,7 +13,6 @@ import (
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/oauth2/v1"
 	"google.golang.org/api/option"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
@@ -70,7 +68,7 @@ func AuthenticateUser(c *gin.Context) {
 			user.LastName = userInfo.FamilyName
 			user.UserId = userInfo.Id
 			user.AvatarURL = userInfo.Picture
-			user.LastLanguage = "German" // TODO change
+			user.LastLanguage = "" // TODO change
 		}
 
 		// Inserting new user into database
@@ -199,39 +197,4 @@ func getUserInfo(token string) (*oauth2.Userinfoplus, error) {
 		return nil, e
 	}
 	return userInfo, nil
-}
-
-// Подумать над интеграцией с Мирасом
-// Сделать рефакторинг
-
-// Запасной вариант
-
-type UserInfo struct {
-	Sub           string `json:"sub"`
-	Name          string `json:"name"`
-	GivenName     string `json:"given_name"`
-	FamilyName    string `json:"family_name"`
-	Profile       string `json:"profile"`
-	Picture       string `json:"picture"`
-	Email         string `json:"email"`
-	EmailVerified bool   `json:"email_verified"`
-	Gender        string `json:"gender"`
-}
-
-func getGoogleUserInfo(token string) (*UserInfo, error) {
-	client := http.Client{Timeout: time.Second * 30}
-	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo?access_token=" + token)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	var result UserInfo
-	if err := json.Unmarshal(data, &result); err != nil {
-		return nil, err
-	}
-	return &result, nil
 }

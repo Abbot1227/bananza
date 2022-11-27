@@ -1,14 +1,18 @@
 package db
 
-type Authorization interface {
-}
+import (
+	"Bananza/models"
+	"context"
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
-type Progress interface {
+type Authorization interface {
+	FindUser(ctx context.Context, ID string) error
+	CreateUser(ctx context.Context, user *models.User) (*mongo.InsertOneResult, error)
 }
 
 type Repository struct {
 	Authorization
-	Progress
 }
 
 func NewRepository() *Repository {
