@@ -235,7 +235,7 @@ func SetLastLanguage(c *gin.Context) {
 		fmt.Println(err)
 	}
 	defer cancel()
-	fmt.Println(languageProgress)
+	fmt.Println("USER PROGRESS:", languageProgress)
 
 	c.JSON(http.StatusOK, languageProgress)
 }
