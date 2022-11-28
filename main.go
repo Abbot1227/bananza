@@ -56,7 +56,8 @@ func main() {
 	exercise := router.Group("/exercises")
 	{
 		exercise.POST("/mic/:lang", routes.LoadAudio) // Test
-		exercise.GET("/:num", routes.NextExercise)
+		exercise.POST("/new", routes.LangExercise)
+		exercise.POST("/answer", routes.SendAnswer)
 	}
 
 	router.Run(":8080")

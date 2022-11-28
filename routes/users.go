@@ -224,6 +224,7 @@ func SetLastLanguage(c *gin.Context) {
 			if insertErr != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				defer cancel()
+				return
 			}
 			defer cancel()
 			fmt.Println(insertResult)
@@ -233,6 +234,7 @@ func SetLastLanguage(c *gin.Context) {
 		}
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		fmt.Println(err)
+		return
 	}
 	defer cancel()
 	fmt.Println("USER PROGRESS:", languageProgress)
