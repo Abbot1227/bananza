@@ -217,7 +217,7 @@ func SetLastLanguage(c *gin.Context) {
 		if err == mongo.ErrNoDocuments {
 			newUserProgress := models.UserProgress{ID: primitive.NewObjectID(),
 				Language: lastLanguage.LastLanguage,
-				Progress: 0,
+				Level:    0,
 				User:     userID}
 
 			insertResult, insertErr := userProgressCollection.InsertOne(ctx, &newUserProgress)

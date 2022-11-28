@@ -17,6 +17,9 @@ var client = &http.Client{}
 func LoadAudio(c *gin.Context) {
 	_, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
+	languageParam := c.Params.ByName("lang")
+	language := languageParam[5:]
+
 	// the FormFile function takes in the POST input id file
 	c.Request.ParseMultipartForm(32 << 20)
 
@@ -32,7 +35,6 @@ func LoadAudio(c *gin.Context) {
 
 	// TODO remove temp structure
 	var temp map[string]interface{}
-	language := "de"
 
 	// Forwarding file to AI part
 	if err = sendPostRequest(file, &temp, language); err != nil {

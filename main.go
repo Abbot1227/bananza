@@ -43,10 +43,10 @@ func main() {
 		user.POST("/login", routes.AuthenticateUser) // Done
 		user.POST("/progress", routes.AddLanguage)   // Done add middlewares check if language exists and user exists or not
 		// R
-		user.GET("/", routes.UserProfiles)             // Done add middlewares authorization only admin
-		user.GET("/:id", routes.UserProfile)           // Done authorization only admin
-		user.GET("/progresslang", routes.UserProgress) // Done add middlewares authorization only admin проверить что только юзер с тем id может запрашивать свои
-		user.GET("/progress/:id", routes.UserProgresses)
+		user.GET("/", routes.UserProfiles)               // Done add middlewares authorization only admin
+		user.GET("/:id", routes.UserProfile)             // Done authorization only admin
+		user.GET("/progresslang", routes.UserProgress)   // Done add middlewares authorization only admin проверить что только юзер с тем id может запрашивать свои
+		user.GET("/progress/:id", routes.UserProgresses) // Done add middlewares authorization only admin проверить что только юзер с тем id может запрашивать свои
 		// U
 		user.PUT("/progress", routes.UpdateProgress) // Test add middlewares check if exists
 		user.PUT("/lastlang", routes.SetLastLanguage)
@@ -55,7 +55,7 @@ func main() {
 
 	exercise := router.Group("/exercises")
 	{
-		exercise.POST("/mic", routes.LoadAudio) // Test
+		exercise.POST("/mic/:lang", routes.LoadAudio) // Test
 		exercise.GET("/:num", routes.NextExercise)
 	}
 

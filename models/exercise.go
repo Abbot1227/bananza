@@ -2,6 +2,8 @@ package models
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
+// Models
+
 type TextExercise struct {
 	ID       primitive.ObjectID `bson:"id"`
 	Type     int                `json:"type"`
@@ -21,6 +23,8 @@ type ExercisesSet struct {
 	AudioExercise map[int]AudioExercise
 	Level         int
 }
+
+// Forms
 
 type InputTextExercise struct {
 	ID     primitive.ObjectID `bson:"id"`

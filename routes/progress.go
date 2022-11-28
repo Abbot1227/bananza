@@ -45,7 +45,7 @@ func AddLanguage(c *gin.Context) {
 
 	userProgress := models.UserProgress{ID: primitive.NewObjectID(),
 		Language: inputLanguage.Language,
-		Progress: 0,
+		Level:    0,
 		User:     user}
 
 	// Inserting new language into database
