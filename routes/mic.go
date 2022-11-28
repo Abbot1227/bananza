@@ -87,7 +87,7 @@ func sendPostRequest(file multipart.File, temp *map[string]interface{}, language
 
 // createAudioFilename is a function to generate audio file name
 func createAudioFilename(language string) string {
-	// language - de, ru, kr
+	// language - de, kr
 	filename := language + "_audio" + time.Now().Format("01022006150405") + ".mp3"
 	return filename
 }

@@ -45,7 +45,7 @@ func AddLanguage(c *gin.Context) {
 
 	userProgress := models.UserProgress{ID: primitive.NewObjectID(),
 		Language: inputLanguage.Language,
-		Level:    0,
+		Progress: 0,
 		User:     user}
 
 	// Inserting new language into database
@@ -94,6 +94,37 @@ func UserProgress(c *gin.Context) {
 	fmt.Println(languageProgress)
 
 	c.JSON(http.StatusOK, languageProgress)
+}
+
+// UserProgresses is a function TODO add description
+func UserProgresses(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+
+	userID := c.Params.ByName("id")
+	docID, _ := primitive.ObjectIDFromHex(userID[3:])
+	filter := bson.D{{"user", docID}}
+
+	var userProgress []models.UserProgress
+
+	cursor, err := userProgressCollection.Find(ctx, filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+
+	if err = cursor.All(ctx, &userProgress); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+	defer cancel()
+
+	fmt.Println(userProgress)
+
+	c.JSON(http.StatusOK, userProgress)
 }
 
 // UpdateProgress is a function

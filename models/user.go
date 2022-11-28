@@ -18,7 +18,7 @@ type User struct {
 type UserProgress struct {
 	ID       primitive.ObjectID `bson:"_id"`
 	Language string             `json:"language"`
-	Level    int                `json:"level"`
+	Progress int                `json:"level"`
 	User     primitive.ObjectID `bson:"user"`
 }
 
@@ -31,6 +31,6 @@ type InputLanguage struct {
 
 type LanguageUpdate struct {
 	Language string `json:"language"`
-	Level    int    `json:"level"`
+	Progress int    `json:"level"`
 	User     string `json:"user"`
 }
