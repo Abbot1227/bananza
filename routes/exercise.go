@@ -41,6 +41,8 @@ func LangExercise(c *gin.Context) {
 		// TODO do nothing
 	}
 
+	fmt.Println(exerciseType)
+
 	switch exerciseType {
 	case 0:
 		var exercise models.SendTextExercise
@@ -98,18 +100,21 @@ func LangExercise(c *gin.Context) {
 
 func sendEnDeExercise(ctx context.Context, level int, sendExercise *models.SendTextExercise) error {
 	var exercise models.TextExercise
-	filter := bson.D{{"$sample", bson.D{{"size", 1}}},
-		{"$and",
-			bson.A{
-				bson.D{{"type", 0}},
-				bson.D{{"level", level}},
-			},
-		},
-	}
+	pipeline := bson.D{{"$match", bson.D{{"type", 0}}},
+		{"$match", bson.D{{"level", level}}},
+		{"$sample", bson.D{{"size", 1}}}}
 
-	if err := tempExercisesCollection.FindOne(ctx, filter).Decode(&exercise); err != nil {
+	cursor, err := tempExercisesCollection.Aggregate(ctx, pipeline)
+	if err != nil {
 		fmt.Println(err)
 		return err
+	}
+
+	for cursor.Next(ctx) {
+		err = cursor.Decode(&exercise)
+		if err != nil {
+			return err
+		}
 	}
 	fmt.Println("Got Exercise:", exercise)
 
@@ -122,18 +127,21 @@ func sendEnDeExercise(ctx context.Context, level int, sendExercise *models.SendT
 
 func sendDeEnExercise(ctx context.Context, level int, sendExercise *models.SendTextExercise) error {
 	var exercise models.TextExercise
-	filter := bson.D{{"$sample", bson.D{{"size", 1}}},
-		{"$and",
-			bson.A{
-				bson.D{{"type", 1}},
-				bson.D{{"level", level}},
-			},
-		},
-	}
+	pipeline := bson.D{{"$match", bson.D{{"type", 1}}},
+		{"$match", bson.D{{"level", level}}},
+		{"$sample", bson.D{{"size", 1}}}}
 
-	if err := tempExercisesCollection.FindOne(ctx, filter).Decode(&exercise); err != nil {
+	cursor, err := tempExercisesCollection.Aggregate(ctx, pipeline)
+	if err != nil {
 		fmt.Println(err)
 		return err
+	}
+
+	for cursor.Next(ctx) {
+		err = cursor.Decode(&exercise)
+		if err != nil {
+			return err
+		}
 	}
 	fmt.Println("Got Exercise:", exercise)
 
@@ -146,19 +154,23 @@ func sendDeEnExercise(ctx context.Context, level int, sendExercise *models.SendT
 
 func sendImageExercise(ctx context.Context, level int, sendExercise *models.SendImageExercise) error {
 	var exercise models.ImageExercise
-	filter := bson.D{
-		{"$and",
-			bson.A{
-				bson.D{{"type", 2}},
-				bson.D{{"level", level}},
-			},
-		},
-	}
+	pipeline := bson.D{{"$match", bson.D{{"type", 2}}},
+		{"$match", bson.D{{"level", level}}},
+		{"$sample", bson.D{{"size", 1}}}}
 
-	if err := tempExercisesCollection.FindOne(ctx, filter).Decode(&exercise); err != nil {
+	cursor, err := tempExercisesCollection.Aggregate(ctx, pipeline)
+	if err != nil {
 		fmt.Println(err)
 		return err
 	}
+
+	for cursor.Next(ctx) {
+		err = cursor.Decode(&exercise)
+		if err != nil {
+			return err
+		}
+	}
+	fmt.Println(exercise)
 
 	sendExercise.ID = exercise.ID
 	sendExercise.Type = exercise.Type
@@ -192,6 +204,24 @@ func sendImageExercise(ctx context.Context, level int, sendExercise *models.Send
 //}
 
 func SendAnswer(c *gin.Context) {
+	_, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+
+	var inputAnswer models.InputAnswer
+
+	if err := c.BindJSON(&inputAnswer); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+
+	// Ensure that data we receive is correct
+	validationErr := validate.Struct(&inputAnswer)
+	if validationErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+		defer cancel()
+		return
+	}
 
 }
 
@@ -200,7 +230,7 @@ func SendAnswer(c *gin.Context) {
 func generateRandomType() int {
 	rand.Seed(time.Now().UnixNano())
 	min := 0
-	max := 4
+	max := 2
 
 	return rand.Intn(max-min+1) + min
 }

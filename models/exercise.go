@@ -6,7 +6,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 // TextExercise is type 0 is EnDe, 1 is DeEn
 type TextExercise struct {
-	ID       primitive.ObjectID `bson:"id"`
+	ID       primitive.ObjectID `bson:"_id"`
 	Type     int                `json:"type"`
 	Question string             `json:"question"`
 	Answer   string             `json:"answer"`
@@ -15,7 +15,7 @@ type TextExercise struct {
 
 // ImageExercise is type 2
 type ImageExercise struct {
-	ID       primitive.ObjectID `bson:"id"`
+	ID       primitive.ObjectID `bson:"_id"`
 	Type     int                `json:"type"`
 	Question string             `json:"question"`
 	Answer   string             `json:"answer"`
@@ -24,7 +24,7 @@ type ImageExercise struct {
 
 // ImagesExercise is type 3
 type ImagesExercise struct {
-	ID     primitive.ObjectID    `bson:"id"`
+	ID     primitive.ObjectID    `bson:"_id"`
 	Type   int                   `json:"type"`
 	Word   string                `json:"word"`
 	Cards  []ImagesExerciseCards `json:"cards"`
@@ -32,13 +32,15 @@ type ImagesExercise struct {
 	Level  int                   `json:"level"`
 }
 
+// ImagesExerciseCards stores card for type 3
 type ImagesExerciseCards struct {
-	Word  string `json:"word"`
-	Media string `json:"media"`
+	Answer string `json:"answer"`
+	Media  string `json:"media"`
 }
 
+// AudioExercise is type 4
 type AudioExercise struct {
-	ID    primitive.ObjectID `bson:"id"`
+	ID    primitive.ObjectID `bson:"_id"`
 	Type  int                `json:"type"`
 	Word  string             `json:"word"`
 	Level int                `json:"level"`
@@ -46,10 +48,14 @@ type AudioExercise struct {
 
 // Forms
 
+// 	Acquire
+
 type AcquireExercise struct {
 	Exp  int    `json:"exp"`
 	Lang string `json:"lang"`
 }
+
+//	Send
 
 type SendTextExercise struct {
 	ID       primitive.ObjectID `bson:"id"`
@@ -63,16 +69,10 @@ type SendImageExercise struct {
 	Question string             `json:"question"`
 }
 
-type InputTextExercise struct {
-	ID     primitive.ObjectID `bson:"id"`
-	Answer string             `json:"answer"`
-	User   string             `json:"user"`
-	Level  int                `json:"level"`
-}
+//	Input
 
-type InputImageExercise struct {
+type InputAnswer struct {
 	ID     primitive.ObjectID `bson:"id"`
 	Answer string             `json:"answer"`
 	User   string             `json:"user"`
-	Level  int                `json:"level"`
 }
