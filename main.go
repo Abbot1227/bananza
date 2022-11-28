@@ -46,7 +46,7 @@ func main() {
 		user.GET("/", routes.UserProfiles)             // Done add middlewares authorization only admin
 		user.GET("/:id", routes.UserProfile)           // Done authorization only admin
 		user.GET("/progresslang", routes.UserProgress) // Done add middlewares authorization only admin проверить что только юзер с тем id может запрашивать свои
-		user.GET("/progress", routes.UserProgresses)
+		user.GET("/progress/:id", routes.UserProgresses)
 		// U
 		user.PUT("/progress", routes.UpdateProgress) // Test add middlewares check if exists
 		user.PUT("/lastlang", routes.SetLastLanguage)
