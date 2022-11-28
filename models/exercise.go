@@ -34,16 +34,16 @@ type ImagesExercise struct {
 
 // ImagesExerciseCards stores card for type 3
 type ImagesExerciseCards struct {
-	Answer string `json:"answer"`
-	Media  string `json:"media"`
+	Word  string `json:"word"`
+	Media string `json:"media"`
 }
 
 // AudioExercise is type 4
 type AudioExercise struct {
-	ID    primitive.ObjectID `bson:"_id"`
-	Type  int                `json:"type"`
-	Word  string             `json:"word"`
-	Level int                `json:"level"`
+	ID     primitive.ObjectID `bson:"_id"`
+	Type   int                `json:"type"`
+	Answer string             `json:"answer"`
+	Level  int                `json:"level"`
 }
 
 // Forms
@@ -72,7 +72,7 @@ type SendImageExercise struct {
 //	Input
 
 type InputAnswer struct {
-	ID     primitive.ObjectID `bson:"id"`
-	Answer string             `json:"answer"`
-	User   string             `json:"user"`
+	ID     string `json:"id"`
+	Answer string `json:"answer"`
+	User   string `json:"user"`
 }

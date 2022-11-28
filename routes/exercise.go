@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"math/rand"
 	"net/http"
 	"time"
@@ -18,6 +20,8 @@ func LangExercise(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
 	var acquireExercise models.AcquireExercise
+
+	fmt.Println(acquireExercise)
 
 	if err := c.BindJSON(&acquireExercise); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -195,27 +199,71 @@ func sendImageExercise(ctx context.Context, level int, sendExercise *models.Send
 //}
 
 func SendAnswer(c *gin.Context) {
-	//ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
-	//
-	//var inputAnswer models.InputAnswer
-	//
-	//if err := c.BindJSON(&inputAnswer); err != nil {
-	//	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	//	fmt.Println(err)
-	//	defer cancel()
-	//	return
-	//}
-	//
-	//// Ensure that data we receive is correct
-	//validationErr := validate.Struct(&inputAnswer)
-	//if validationErr != nil {
-	//	c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
-	//	defer cancel()
-	//	return
-	//}
-	//
-	//if err := tempExercisesCollection.FindOne(ctx)
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
+	language := c.Params.ByName("lang")
+	language = language[5:]
+
+	var inputAnswer models.InputAnswer
+
+	if err := c.BindJSON(&inputAnswer); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+
+	// Ensure that data we receive is correct
+	validationErr := validate.Struct(&inputAnswer)
+	if validationErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+		defer cancel()
+		return
+	}
+
+	var answerStruct bson.D
+	questionId, _ := primitive.ObjectIDFromHex(inputAnswer.ID)
+	filter := bson.D{{"_id", questionId}}
+	opts := options.FindOne().SetProjection(bson.D{{"_id", 0}, {"answer", 1}})
+
+	if err := tempExercisesCollection.FindOne(ctx, filter, opts).Decode(&answerStruct); err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		defer cancel()
+		return
+	}
+	defer cancel()
+	answer := answerStruct.Map()
+
+	fmt.Println(questionId)
+	fmt.Println("Right:", answer["answer"])
+	fmt.Println("User:", inputAnswer.Answer)
+
+	// Добавить прибавление очков пользователю за правильный ответ
+	if inputAnswer.Answer == answer["answer"] {
+		c.JSON(http.StatusOK, gin.H{"correct": "true"})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"correct": "false"})
+		return
+	}
+
+	filter = bson.D{
+		{"$and",
+			bson.A{
+				bson.D{{"user", inputAnswer.ID}},
+				bson.D{{"language", language}},
+			},
+		}}
+	update := bson.D{{"$inc",
+		bson.D{
+			{"level", 15},
+		},
+	}}
+
+	_, err := usersCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		fmt.Println("Could not add points to user", inputAnswer.User)
+	}
 }
 
 // generateRandomType is a function that generates number between 0 and 4

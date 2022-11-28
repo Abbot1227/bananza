@@ -57,7 +57,7 @@ func main() {
 	{
 		exercise.POST("/mic/:lang", routes.LoadAudio)
 		exercise.POST("/new", routes.LangExercise)
-		exercise.POST("/answer", routes.SendAnswer)
+		exercise.POST("/answer/:lang", routes.SendAnswer)
 	}
 
 	router.Run(":8080")
