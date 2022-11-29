@@ -87,13 +87,17 @@ func LangExercise(c *gin.Context) {
 	//		defer cancel()
 	//		break
 	//	}
-	//case 4:
-	//	sendAudioExercise(ctx, level)
-	//	if err := sendAudioExercise(ctx, level); err != nil {
-	//		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	//		defer cancel()
-	//		break
-	//	}
+	case 4:
+		var exercise models.SendAudioExercise
+
+		if err := sendAudioExercise(ctx, level, &exercise); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			defer cancel()
+			break
+		}
+		fmt.Println(exercise)
+
+		c.JSON(http.StatusOK, exercise)
 	default:
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
 		defer cancel()
@@ -185,18 +189,30 @@ func sendImageExercise(ctx context.Context, level int, sendExercise *models.Send
 //		},
 //	}
 //}
-//
-//func sendAudioExercise(ctx context.Context, level int) error {
-//	var exercise models.AudioExercise
-//	filter := bson.D{
-//		{"$and",
-//			bson.A{
-//				bson.D{{"type", 4}},
-//				bson.D{{"level", level}},
-//			},
-//		},
-//	}
-//}
+
+func sendAudioExercise(ctx context.Context, level int, sendExercise *models.SendAudioExercise) error {
+	var exercise models.AudioExercise
+	filter := bson.D{
+		{"$and",
+			bson.A{
+				bson.D{{"type", 4}},
+				bson.D{{"level", level}},
+			},
+		},
+	}
+
+	if err := tempExercisesCollection.FindOne(ctx, filter).Decode(&exercise); err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	fmt.Println(exercise)
+
+	sendExercise.ID = exercise.ID
+	sendExercise.Type = exercise.Type
+	sendExercise.Question = exercise.Answer
+
+	return nil
+}
 
 func SendAnswer(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
@@ -241,9 +257,9 @@ func SendAnswer(c *gin.Context) {
 
 	// Добавить прибавление очков пользователю за правильный ответ
 	if inputAnswer.Answer == answer["answer"] {
-		c.JSON(http.StatusOK, gin.H{"correct": "true"})
+		c.JSON(http.StatusOK, gin.H{"correct": "true", "answer": answer["answer"]})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"correct": "false"})
+		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": answer["answer"]})
 		return
 	}
 
@@ -266,4 +282,8 @@ func generateRandomType() int {
 	max := 4
 
 	return rand.Intn(max-min+1) + min
+}
+
+func calculateGainExp(level int) int {
+	return 1/level - 1
 }
