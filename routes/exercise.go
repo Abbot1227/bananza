@@ -217,9 +217,6 @@ func sendAudioExercise(ctx context.Context, level int, sendExercise *models.Send
 func SendAnswer(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
-	language := c.Params.ByName("lang")
-	language = language[5:]
-
 	var inputAnswer models.InputAnswer
 
 	if err := c.BindJSON(&inputAnswer); err != nil {
