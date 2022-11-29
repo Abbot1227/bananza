@@ -247,23 +247,15 @@ func SendAnswer(c *gin.Context) {
 		return
 	}
 
-	filter = bson.D{
-		{"$and",
-			bson.A{
-				bson.D{{"user", inputAnswer.ID}},
-				bson.D{{"language", language}},
-			},
-		}}
-	update := bson.D{{"$inc",
-		bson.D{
-			{"level", 15},
-		},
-	}}
+	languageId, _ := primitive.ObjectIDFromHex(inputAnswer.LanguageId)
 
-	_, err := usersCollection.UpdateOne(ctx, filter, update)
+	result, err := userProgressCollection.UpdateByID(ctx, languageId, bson.D{
+		{"$inc", bson.D{{"level", 15}}},
+	})
 	if err != nil {
-		fmt.Println("Could not add points to user", inputAnswer.User)
+		fmt.Println("Could not add points to user")
 	}
+	fmt.Println(result)
 }
 
 // generateRandomType is a function that generates number between 0 and 4
@@ -271,7 +263,7 @@ func SendAnswer(c *gin.Context) {
 func generateRandomType() int {
 	rand.Seed(time.Now().UnixNano())
 	min := 0
-	max := 2
+	max := 4
 
 	return rand.Intn(max-min+1) + min
 }

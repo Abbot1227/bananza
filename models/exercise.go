@@ -72,7 +72,8 @@ type SendImageExercise struct {
 //	Input
 
 type InputAnswer struct {
-	ID     string `json:"id"`
-	Answer string `json:"answer"`
-	User   string `json:"user"`
+	ID         string `json:"id"`
+	Answer     string `json:"answer"`
+	LanguageId string `json:"languageId"`
+	Level      int    `json:"level"`
 }
