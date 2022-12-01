@@ -39,7 +39,7 @@ func SendExercise(c *gin.Context) {
 	}
 
 	exerciseType := generateRandomType()
-	level := acquireExercise.Exp
+	level := acquireExercise.Exp / 100
 
 	if acquireExercise.Lang == "de" {
 		// TODO do nothing
@@ -283,6 +283,7 @@ func SendAnswer(c *gin.Context) {
 	if inputAnswer.Answer == answer["answer"] {
 		c.JSON(http.StatusOK, gin.H{"correct": "true", "answer": answer["answer"], "exp": expToAdd})
 	} else {
+
 		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": answer["answer"], "exp": 0})
 		return
 	}
