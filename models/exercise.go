@@ -69,6 +69,13 @@ type SendImageExercise struct {
 	Question string             `json:"question"`
 }
 
+type SendImagesExercise struct {
+	ID    primitive.ObjectID    `bson:"_id"`
+	Type  int                   `json:"type"`
+	Word  string                `json:"word"`
+	Cards []ImagesExerciseCards `json:"cards"`
+}
+
 type SendAudioExercise struct {
 	ID       primitive.ObjectID `bson:"id"`
 	Type     int                `json:"type"`

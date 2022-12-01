@@ -81,12 +81,17 @@ func SendExercise(c *gin.Context) {
 		fmt.Println(exercise)
 
 		c.JSON(http.StatusOK, exercise)
-	//case 3:
-	//	if err := sendImagesExercise(ctx, level); err != nil {
-	//		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	//		defer cancel()
-	//		break
-	//	}
+	case 3:
+		var exercise models.SendImagesExercise
+
+		if err := sendImagesExercise(ctx, level, &exercise); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			defer cancel()
+			break
+		}
+		fmt.Println(exercise)
+
+		c.JSON(http.StatusOK, exercise)
 	case 4:
 		var exercise models.SendAudioExercise
 
@@ -178,17 +183,30 @@ func sendImageExercise(ctx context.Context, level int, sendExercise *models.Send
 	return nil
 }
 
-//func sendImagesExercise(ctx context.Context, level int) error {
-//	var exercise models.ImagesExercise
-//	filter := bson.D{
-//		{"$and",
-//			bson.A{
-//				bson.D{{"type", 3}},
-//				bson.D{{"level", level}},
-//			},
-//		},
-//	}
-//}
+func sendImagesExercise(ctx context.Context, level int, sendExercise *models.SendImagesExercise) error {
+	var exercise models.ImagesExercise
+	filter := bson.D{
+		{"$and",
+			bson.A{
+				bson.D{{"type", 3}},
+				bson.D{{"level", level}},
+			},
+		},
+	}
+
+	if err := tempExercisesCollection.FindOne(ctx, filter).Decode(&exercise); err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	fmt.Println(exercise)
+
+	sendExercise.ID = exercise.ID
+	sendExercise.Type = exercise.Type
+	sendExercise.Word = exercise.Word
+	sendExercise.Cards = exercise.Cards
+
+	return nil
+}
 
 func sendAudioExercise(ctx context.Context, level int, sendExercise *models.SendAudioExercise) error {
 	var exercise models.AudioExercise
@@ -294,5 +312,5 @@ func calculateGainExp(level int) int {
 	if level == 0 {
 		return 5
 	}
-	return 1 / (level - 1) * 15
+	return 1 / (level / (100 - (level / 100))) * 15
 }
