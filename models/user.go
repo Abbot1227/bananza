@@ -13,6 +13,7 @@ type User struct {
 	UserId       string             `json:"user_id"`
 	AvatarURL    string             `json:"avatar_url"`
 	LastLanguage string             `json:"last_language"`
+	Balance      int                `json:"balance"`
 }
 
 type UserProgress struct {

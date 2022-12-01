@@ -69,6 +69,7 @@ func AuthenticateUser(c *gin.Context) {
 			user.UserId = userInfo.Id
 			user.AvatarURL = userInfo.Picture
 			user.LastLanguage = "" // TODO change
+			user.Balance = 0
 		}
 
 		// Inserting new user into database

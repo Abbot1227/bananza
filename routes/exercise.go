@@ -16,7 +16,7 @@ import (
 
 var tempExercisesCollection = db.OpenCollection(db.Client, "tempExercises")
 
-func LangExercise(c *gin.Context) {
+func SendExercise(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
 	var acquireExercise models.AcquireExercise
@@ -218,6 +218,8 @@ func SendAnswer(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
 	var inputAnswer models.InputAnswer
+
+	fmt.Println(inputAnswer)
 
 	if err := c.BindJSON(&inputAnswer); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
