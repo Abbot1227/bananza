@@ -21,14 +21,13 @@ var client = &http.Client{}
 func LoadAudio(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
-	languageParam := c.Params.ByName("lang")
-	language := languageParam[5:]
+	//languageParam := c.Params.ByName("lang")
+	//language := languageParam[5:]
 
 	// the FormFile function takes in the POST input id file
 	c.Request.ParseMultipartForm(32 << 20)
 
 	questionId := c.Request.MultipartForm.Value["id"]
-	answer := c.Request.MultipartForm.Value["answer"]
 	languageId := c.Request.MultipartForm.Value["languageId"]
 	level := c.Request.MultipartForm.Value["level"]
 	file, _, err := c.Request.FormFile("mp3")
@@ -45,10 +44,13 @@ func LoadAudio(c *gin.Context) {
 	var temp map[string]interface{}
 
 	// Forwarding file to AI part
-	if err = sendPostRequest(file, &temp, language); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	//if err = sendPostRequest(file, &temp, language); err != nil {
+	//	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	//	return
+	//}
+
+	// TODO не забудь убрать
+	temp["text"] = "Froehliche Weihnachten"
 
 	var answerStruct bson.D
 	question, _ := primitive.ObjectIDFromHex(questionId[0])
@@ -69,9 +71,9 @@ func LoadAudio(c *gin.Context) {
 
 	fmt.Println(questionId)
 	fmt.Println("Right:", rightAnswer["answer"])
-	fmt.Println("User:", answer[0])
+	fmt.Println("User:", temp["text"])
 
-	if answer[0] == rightAnswer["answer"] {
+	if temp["text"] == rightAnswer["answer"] {
 		c.JSON(http.StatusOK, gin.H{"correct": "true", "answer": rightAnswer["answer"], "exp": expToAdd})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": rightAnswer["answer"], "exp": 0})
