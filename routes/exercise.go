@@ -248,22 +248,24 @@ func SendAnswer(c *gin.Context) {
 	defer cancel()
 	answer := answerStruct.Map()
 
+	expToAdd := calculateGainExp(inputAnswer.Level)
+
 	fmt.Println(questionId)
 	fmt.Println("Right:", answer["answer"])
 	fmt.Println("User:", inputAnswer.Answer)
 
 	// Добавить прибавление очков пользователю за правильный ответ
 	if inputAnswer.Answer == answer["answer"] {
-		c.JSON(http.StatusOK, gin.H{"correct": "true", "answer": answer["answer"]})
+		c.JSON(http.StatusOK, gin.H{"correct": "true", "answer": answer["answer"], "exp": expToAdd})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": answer["answer"]})
+		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": answer["answer"], "exp": 0})
 		return
 	}
 
 	languageId, _ := primitive.ObjectIDFromHex(inputAnswer.LanguageId)
 
 	result, err := userProgressCollection.UpdateByID(ctx, languageId, bson.D{
-		{"$inc", bson.D{{"level", 15}}},
+		{"$inc", bson.D{{"level", expToAdd}}},
 	})
 	if err != nil {
 		fmt.Println("Could not add points to user")
@@ -282,5 +284,8 @@ func generateRandomType() int {
 }
 
 func calculateGainExp(level int) int {
-	return 1/level - 1
+	if level == 0 {
+		return 5
+	}
+	return 1 / (level - 1) * 15
 }
