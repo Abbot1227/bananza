@@ -219,8 +219,6 @@ func SendAnswer(c *gin.Context) {
 
 	var inputAnswer models.InputAnswer
 
-	fmt.Println(inputAnswer)
-
 	if err := c.BindJSON(&inputAnswer); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		fmt.Println(err)
@@ -235,6 +233,13 @@ func SendAnswer(c *gin.Context) {
 		defer cancel()
 		return
 	}
+
+	fmt.Println("This is answer:")
+	fmt.Println(inputAnswer.ID)
+	fmt.Println(inputAnswer.Answer)
+	fmt.Println(inputAnswer.LanguageId)
+	fmt.Println(inputAnswer.Level)
+	fmt.Println("End")
 
 	var answerStruct bson.D
 	questionId, _ := primitive.ObjectIDFromHex(inputAnswer.ID)
