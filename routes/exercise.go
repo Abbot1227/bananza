@@ -310,7 +310,7 @@ func generateRandomType() int {
 }
 
 func calculateGainExp(level int) int {
-	if level == 0 {
+	if level/100 == 0 {
 		return 5
 	}
 	return 1 / (level / (100 - (level / 100))) * 15

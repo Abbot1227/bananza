@@ -6,16 +6,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"io"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 	"time"
 )
 
 var client = &http.Client{}
 
 func LoadAudio(c *gin.Context) {
-	_, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
 	languageParam := c.Params.ByName("lang")
 	language := languageParam[5:]
@@ -23,6 +27,10 @@ func LoadAudio(c *gin.Context) {
 	// the FormFile function takes in the POST input id file
 	c.Request.ParseMultipartForm(32 << 20)
 
+	questionId := c.Request.MultipartForm.Value["id"]
+	answer := c.Request.MultipartForm.Value["answer"]
+	languageId := c.Request.MultipartForm.Value["languageId"]
+	level := c.Request.MultipartForm.Value["level"]
 	file, _, err := c.Request.FormFile("mp3")
 	if err != nil {
 		fmt.Println("Error when requesting file" + err.Error())
@@ -42,7 +50,43 @@ func LoadAudio(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"text": temp["text"]})
+	var answerStruct bson.D
+	question, _ := primitive.ObjectIDFromHex(questionId[0])
+	filter := bson.D{{"_id", question}}
+	opts := options.FindOne().SetProjection(bson.D{{"_id", 0}, {"answer", 1}})
+
+	if err := tempExercisesCollection.FindOne(ctx, filter, opts).Decode(&answerStruct); err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		defer cancel()
+		return
+	}
+	defer cancel()
+	rightAnswer := answerStruct.Map()
+
+	exp, _ := strconv.Atoi(level[0])
+	expToAdd := calculateGainExp(exp)
+
+	fmt.Println(questionId)
+	fmt.Println("Right:", rightAnswer["answer"])
+	fmt.Println("User:", answer[0])
+
+	if answer[0] == rightAnswer["answer"] {
+		c.JSON(http.StatusOK, gin.H{"correct": "true", "answer": rightAnswer["answer"], "exp": expToAdd})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": rightAnswer["answer"], "exp": 0})
+		return
+	}
+
+	langId, _ := primitive.ObjectIDFromHex(languageId[0])
+
+	result, err := userProgressCollection.UpdateByID(ctx, langId, bson.D{
+		{"$inc", bson.D{{"level", expToAdd}}},
+	})
+	if err != nil {
+		fmt.Println("Could not add points to user")
+	}
+	fmt.Println(result)
 }
 
 func sendPostRequest(file multipart.File, temp *map[string]interface{}, language string) error {
