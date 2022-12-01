@@ -28,7 +28,7 @@ type ImagesExercise struct {
 	Type   int                   `json:"type"`
 	Word   string                `json:"word"`
 	Cards  []ImagesExerciseCards `json:"cards"`
-	Answer int                   `json:"answer"`
+	Answer string                `json:"answer"`
 	Level  int                   `json:"level"`
 }
 
