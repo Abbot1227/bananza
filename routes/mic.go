@@ -41,7 +41,8 @@ func LoadAudio(c *gin.Context) {
 	defer cancel()
 
 	// TODO remove temp structure
-	var temp map[string]interface{}
+	//var temp map[string]interface{}
+	temp := make(map[string]interface{})
 
 	// Forwarding file to AI part
 	//if err = sendPostRequest(file, &temp, language); err != nil {
