@@ -21,8 +21,8 @@ var client = &http.Client{}
 func LoadAudio(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
-	//languageParam := c.Params.ByName("lang")
-	//language := languageParam[5:]
+	languageParam := c.Params.ByName("lang")
+	language := languageParam[5:]
 
 	// the FormFile function takes in the POST input id file
 	c.Request.ParseMultipartForm(32 << 20)
@@ -41,17 +41,13 @@ func LoadAudio(c *gin.Context) {
 	defer cancel()
 
 	// TODO remove temp structure
-	//var temp map[string]interface{}
-	temp := make(map[string]interface{})
+	var temp map[string]interface{}
 
 	// Forwarding file to AI part
-	//if err = sendPostRequest(file, &temp, language); err != nil {
-	//	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	//	return
-	//}
-
-	// TODO не забудь убрать
-	temp["text"] = "Froehliche Weihnachten"
+	if err = sendPostRequest(file, &temp, language); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
 	var answerStruct bson.D
 	question, _ := primitive.ObjectIDFromHex(questionId[0])

@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"math/rand"
 	"net/http"
@@ -111,127 +112,6 @@ func SendExercise(c *gin.Context) {
 	defer cancel()
 }
 
-func sendEnDeExercise(ctx context.Context, level int, sendExercise *models.SendTextExercise) error {
-	var exercise models.TextExercise
-	filter := bson.D{
-		{"$and",
-			bson.A{
-				bson.D{{"type", 0}},
-				bson.D{{"level", level}},
-			},
-		},
-	}
-
-	if err := tempExercisesCollection.FindOne(ctx, filter).Decode(&exercise); err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	fmt.Println("Got Exercise:", exercise)
-
-	sendExercise.ID = exercise.ID
-	sendExercise.Type = exercise.Type
-	sendExercise.Question = exercise.Question
-
-	return nil
-}
-
-func sendDeEnExercise(ctx context.Context, level int, sendExercise *models.SendTextExercise) error {
-	var exercise models.TextExercise
-	filter := bson.D{
-		{"$and",
-			bson.A{
-				bson.D{{"type", 1}},
-				bson.D{{"level", level}},
-			},
-		},
-	}
-
-	if err := tempExercisesCollection.FindOne(ctx, filter).Decode(&exercise); err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	fmt.Println("Got Exercise:", exercise)
-
-	sendExercise.ID = exercise.ID
-	sendExercise.Type = exercise.Type
-	sendExercise.Question = exercise.Question
-
-	return nil
-}
-
-func sendImageExercise(ctx context.Context, level int, sendExercise *models.SendImageExercise) error {
-	var exercise models.ImageExercise
-	filter := bson.D{
-		{"$and",
-			bson.A{
-				bson.D{{"type", 2}},
-				bson.D{{"level", level}},
-			},
-		},
-	}
-
-	if err := tempExercisesCollection.FindOne(ctx, filter).Decode(&exercise); err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	fmt.Println(exercise)
-
-	sendExercise.ID = exercise.ID
-	sendExercise.Type = exercise.Type
-	sendExercise.Question = exercise.Question
-
-	return nil
-}
-
-func sendImagesExercise(ctx context.Context, level int, sendExercise *models.SendImagesExercise) error {
-	var exercise models.ImagesExercise
-	filter := bson.D{
-		{"$and",
-			bson.A{
-				bson.D{{"type", 3}},
-				bson.D{{"level", level}},
-			},
-		},
-	}
-
-	if err := tempExercisesCollection.FindOne(ctx, filter).Decode(&exercise); err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	fmt.Println(exercise)
-
-	sendExercise.ID = exercise.ID
-	sendExercise.Type = exercise.Type
-	sendExercise.Word = exercise.Word
-	sendExercise.Cards = exercise.Cards
-
-	return nil
-}
-
-func sendAudioExercise(ctx context.Context, level int, sendExercise *models.SendAudioExercise) error {
-	var exercise models.AudioExercise
-	filter := bson.D{
-		{"$and",
-			bson.A{
-				bson.D{{"type", 4}},
-				bson.D{{"level", level}},
-			},
-		},
-	}
-
-	if err := tempExercisesCollection.FindOne(ctx, filter).Decode(&exercise); err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	fmt.Println(exercise)
-
-	sendExercise.ID = exercise.ID
-	sendExercise.Type = exercise.Type
-	sendExercise.Question = exercise.Answer
-
-	return nil
-}
-
 func SendAnswer(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
@@ -299,6 +179,137 @@ func SendAnswer(c *gin.Context) {
 	fmt.Println(result)
 }
 
+func sendEnDeExercise(ctx context.Context, level int, sendExercise *models.SendTextExercise) error {
+	var exercises []models.TextExercise
+	matchTypeStage := bson.D{{"$match", bson.D{{"type", 0}}}}
+	matchLevelStage := bson.D{{"$match", bson.D{{"level", level}}}}
+	randomStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
+
+	cursor, err := tempExercisesCollection.Aggregate(ctx, mongo.Pipeline{matchTypeStage, matchLevelStage, randomStage})
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	if err = cursor.All(ctx, &exercises); err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	for _, exercise := range exercises {
+		sendExercise.ID = exercise.ID
+		sendExercise.Type = exercise.Type
+		sendExercise.Question = exercise.Question
+	}
+
+	return nil
+}
+
+func sendDeEnExercise(ctx context.Context, level int, sendExercise *models.SendTextExercise) error {
+	var exercises []models.TextExercise
+	matchTypeStage := bson.D{{"$match", bson.D{{"type", 1}}}}
+	matchLevelStage := bson.D{{"$match", bson.D{{"level", level}}}}
+	randomStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
+
+	cursor, err := tempExercisesCollection.Aggregate(ctx, mongo.Pipeline{matchTypeStage, matchLevelStage, randomStage})
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	if err = cursor.All(ctx, &exercises); err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	for _, exercise := range exercises {
+		sendExercise.ID = exercise.ID
+		sendExercise.Type = exercise.Type
+		sendExercise.Question = exercise.Question
+	}
+
+	return nil
+}
+
+func sendImageExercise(ctx context.Context, level int, sendExercise *models.SendImageExercise) error {
+	var exercises []models.ImageExercise
+	matchTypeStage := bson.D{{"$match", bson.D{{"type", 2}}}}
+	matchLevelStage := bson.D{{"$match", bson.D{{"level", level}}}}
+	randomStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
+
+	cursor, err := tempExercisesCollection.Aggregate(ctx, mongo.Pipeline{matchTypeStage, matchLevelStage, randomStage})
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	if err = cursor.All(ctx, &exercises); err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	for _, exercise := range exercises {
+		sendExercise.ID = exercise.ID
+		sendExercise.Type = exercise.Type
+		sendExercise.Question = exercise.Question
+	}
+
+	return nil
+}
+
+func sendImagesExercise(ctx context.Context, level int, sendExercise *models.SendImagesExercise) error {
+	var exercises []models.ImagesExercise
+	matchTypeStage := bson.D{{"$match", bson.D{{"type", 3}}}}
+	matchLevelStage := bson.D{{"$match", bson.D{{"level", level}}}}
+	randomStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
+
+	cursor, err := tempExercisesCollection.Aggregate(ctx, mongo.Pipeline{matchTypeStage, matchLevelStage, randomStage})
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	if err = cursor.All(ctx, &exercises); err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	for _, exercise := range exercises {
+		sendExercise.ID = exercise.ID
+		sendExercise.Type = exercise.Type
+		sendExercise.Word = exercise.Word
+		sendExercise.Cards = exercise.Cards
+	}
+
+	return nil
+}
+
+func sendAudioExercise(ctx context.Context, level int, sendExercise *models.SendAudioExercise) error {
+	var exercises []models.AudioExercise
+	matchTypeStage := bson.D{{"$match", bson.D{{"type", 4}}}}
+	matchLevelStage := bson.D{{"$match", bson.D{{"level", level}}}}
+	randomStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
+
+	cursor, err := tempExercisesCollection.Aggregate(ctx, mongo.Pipeline{matchTypeStage, matchLevelStage, randomStage})
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	if err = cursor.All(ctx, &exercises); err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	for _, exercise := range exercises {
+		sendExercise.ID = exercise.ID
+		sendExercise.Type = exercise.Type
+		sendExercise.Question = exercise.Answer
+	}
+
+	return nil
+}
+
 // generateRandomType is a function that generates number between 0 and 4
 // which is a type of exercise
 func generateRandomType() int {
@@ -309,6 +320,8 @@ func generateRandomType() int {
 	return rand.Intn(max-min+1) + min
 }
 
+// calculateGainExp returns number of experience
+// gained by user after solving question
 func calculateGainExp(level int) int {
 	if level/100 == 0 {
 		return 5
