@@ -31,9 +31,9 @@ func main() {
 	// CORS configuration
 	router.Use(cors.Default())
 
-	// Testing docker purpose only
+	// Testing purpose only
 	router.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"health": "docker test"})
+		c.JSON(http.StatusOK, gin.H{"health": "is working"})
 	})
 
 	// user endpoint
@@ -55,9 +55,19 @@ func main() {
 
 	exercise := router.Group("/exercises")
 	{
-		exercise.POST("/audio/:lang", routes.LoadAudio)
+		// C
 		exercise.POST("/new", routes.SendExercise)
 		exercise.POST("/answer", routes.SendAnswer)
+		exercise.POST("/audio/:lang", routes.LoadAudio)
+	}
+
+	addExercise := exercise.Group("/add")
+	addExercise.Use() // TODO add authorization middleware
+	{
+		// C
+		addExercise.POST("/teximg/:lang", routes.AddTextImageExercise)
+		addExercise.POST("/imgs/:lang", routes.AddImagesExercise)
+		addExercise.POST("/audio/:lang", routes.AddAudioExercise)
 	}
 
 	router.Run(":8080")
@@ -65,5 +75,3 @@ func main() {
 }
 
 // Проверять соединение с ML сервером, убирать задания на speech если недоступно
-
-// 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

@@ -6,8 +6,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+var usersCollection = OpenCollection(Client, "users")
+
 type Authorization interface {
-	FindUser(ctx context.Context, ID string) error
+	FindUser(ctx context.Context, ID string, user *models.User) error
 	CreateUser(ctx context.Context, user *models.User) (*mongo.InsertOneResult, error)
 }
 

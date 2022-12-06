@@ -16,6 +16,8 @@ import (
 )
 
 var tempExercisesCollection = db.OpenCollection(db.Client, "tempExercises")
+var deExercisesCollection = db.OpenCollection(db.Client, "deExercises")
+var krExercisesCollection = db.OpenCollection(db.Client, "krExercises")
 
 func SendExercise(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
@@ -41,6 +43,10 @@ func SendExercise(c *gin.Context) {
 
 	exerciseType := generateRandomType()
 	level := acquireExercise.Exp / 100
+
+	if err := checkASRConnection(); err != nil {
+		exerciseType = 0
+	}
 
 	if acquireExercise.Lang == "de" {
 		// TODO do nothing
@@ -177,6 +183,158 @@ func SendAnswer(c *gin.Context) {
 		fmt.Println("Could not add points to user")
 	}
 	fmt.Println(result)
+}
+
+// AddTextImageExercise is a function todo
+func AddTextImageExercise(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	languageParam := c.Params.ByName("lang")
+	language := languageParam[5:]
+
+	var exercise models.TextExercise
+
+	if err := c.BindJSON(&exercise); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+
+	// Ensure that data we receive is correct
+	validationErr := validate.Struct(&exercise)
+	if validationErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+		defer cancel()
+		return
+	}
+
+	objectId := primitive.NewObjectID()
+	exercise.ID = objectId
+
+	switch language {
+	case "de":
+		defer cancel()
+		result, err := deExercisesCollection.InsertOne(ctx, &exercise)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "exercise was not added"})
+			fmt.Println(err.Error())
+			return
+		}
+		c.JSON(http.StatusOK, result)
+	case "kr":
+		defer cancel()
+		result, err := krExercisesCollection.InsertOne(ctx, &exercise)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "exercise was not added"})
+			fmt.Println(err.Error())
+			return
+		}
+		c.JSON(http.StatusOK, result)
+	default: // If wrong exercise was provided
+		fmt.Println(exercise)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "incorrect exercise"})
+	}
+}
+
+func AddImagesExercise(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	languageParam := c.Params.ByName("lang")
+	language := languageParam[5:]
+
+	var exercise models.ImagesExercise
+
+	if err := c.BindJSON(&exercise); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+
+	validationErr := validate.Struct(&exercise)
+	if validationErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+		defer cancel()
+		return
+	}
+
+	objectId := primitive.NewObjectID()
+	exercise.ID = objectId
+
+	switch language {
+	case "de":
+		defer cancel()
+		result, err := deExercisesCollection.InsertOne(ctx, &exercise)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "exercise was not added"})
+			fmt.Println(err.Error())
+			return
+		}
+		c.JSON(http.StatusOK, result)
+	case "kr":
+		defer cancel()
+		result, err := krExercisesCollection.InsertOne(ctx, &exercise)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "exercise was not added"})
+			fmt.Println(err.Error())
+			return
+		}
+		c.JSON(http.StatusOK, result)
+	default:
+		fmt.Println(exercise)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "incorrect exercise"})
+	}
+}
+
+func AddAudioExercise(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	languageParam := c.Params.ByName("lang")
+	language := languageParam[5:]
+
+	var exercise models.AudioExercise
+
+	if err := c.BindJSON(&exercise); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		defer cancel()
+		return
+	}
+
+	validationErr := validate.Struct(&exercise)
+	if validationErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+		defer cancel()
+		return
+	}
+
+	objectId := primitive.NewObjectID()
+	exercise.ID = objectId
+
+	switch language {
+	case "de": // For adding German audio exercise
+		defer cancel()
+		result, err := deExercisesCollection.InsertOne(ctx, &exercise)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "exercise was not added"})
+			fmt.Println(err.Error())
+			return
+		}
+		c.JSON(http.StatusOK, result)
+	case "kr": // For adding Korean audio exercise
+		defer cancel()
+		result, err := krExercisesCollection.InsertOne(ctx, &exercise)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "exercise was not added"})
+			fmt.Println(err.Error())
+			return
+		}
+		c.JSON(http.StatusOK, result)
+	default: // If wrong exercise was provided
+		fmt.Println(exercise)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "incorrect exercise"})
+	}
 }
 
 func sendEnDeExercise(ctx context.Context, level int, sendExercise *models.SendTextExercise) error {
@@ -327,4 +485,18 @@ func calculateGainExp(level int) int {
 		return 5
 	}
 	return 1 / (level / (100 - (level / 100))) * 15
+}
+
+func checkASRConnection() error {
+	req, err := http.NewRequest("GET", "http://localhost:4040/predict", nil)
+	if err != nil {
+		return err
+	}
+
+	res, _ := client.Do(req)
+	if res.StatusCode != http.StatusOK {
+		err = fmt.Errorf("bad status: %s", res.Status)
+		return err
+	}
+	return nil
 }

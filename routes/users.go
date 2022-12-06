@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -73,7 +74,7 @@ func AuthenticateUser(c *gin.Context) {
 		}
 
 		// Inserting new user into database
-		result, insertErr := usersCollection.InsertOne(ctx, &user)
+		_, insertErr := usersCollection.InsertOne(ctx, &user)
 		if insertErr != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "user was not created"})
 			fmt.Println(insertErr)
@@ -82,8 +83,10 @@ func AuthenticateUser(c *gin.Context) {
 		}
 		defer cancel()
 
+		logrus.Print(user)
+
 		// Return result of existing user
-		c.JSON(http.StatusOK, result)
+		c.JSON(http.StatusOK, user)
 		return
 	}
 	defer cancel()
