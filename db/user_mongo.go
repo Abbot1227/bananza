@@ -85,6 +85,22 @@ func (r *UserMongo) FindProgresses(ctx context.Context, userId primitive.ObjectI
 	return &languagesProgress, nil
 }
 
+func (r *UserMongo) SetProgressLevel(ctx context.Context, userProgressUpdate models.UserProgressUpdate) error {
+	update := bson.D{
+		{"$set",
+			bson.D{
+				{"level", userProgressUpdate.Level},
+			}},
+	}
+
+	result, err := userProgressCollection.UpdateByID(ctx, userProgressUpdate.ProgressId, update)
+	if err != nil {
+		return nil
+	}
+	logrus.Println(result)
+	return nil
+}
+
 func (r *UserMongo) SetLastLanguage(ctx context.Context, userId primitive.ObjectID, language string) error {
 	update := bson.D{
 		{"$set",

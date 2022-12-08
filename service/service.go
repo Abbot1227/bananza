@@ -18,10 +18,17 @@ type User interface {
 	FindProfile(userId primitive.ObjectID) (*models.User, error)
 	FindProgress(userId primitive.ObjectID, language string) (*models.UserProgress, error)
 	FindProgresses(userId primitive.ObjectID) (*[]models.UserProgress, error)
+	SetProgressLevel(userProgressUpdate models.UserProgressUpdate) error
 	SetLastLanguage(userId primitive.ObjectID, language string) error
 }
 
 type Exercise interface {
+	GetExerciseType() (int, error)
+	GetEnLnExercise(exerciseDesc models.AcquireExercise, exercise *models.SendTextExercise) error
+	GetLnEnExercise(exerciseDesc models.AcquireExercise, exercise *models.SendTextExercise) error
+	GetImageExercise(exerciseDesc models.AcquireExercise, exercise *models.SendImageExercise) error
+	GetImagesExercise(exerciseDesc models.AcquireExercise, exercise *models.SendImagesExercise) error
+	GetAudioExercise(exerciseDesc models.AcquireExercise, exercise *models.SendAudioExercise) error
 }
 
 type Forum interface {

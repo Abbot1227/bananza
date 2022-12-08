@@ -84,6 +84,17 @@ func (s *UserService) FindProgresses(userId primitive.ObjectID) (*[]models.UserP
 	return progresses, nil
 }
 
+func (s *UserService) SetProgressLevel(userProgressUpdate models.UserProgressUpdate) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	if err := s.repo.SetProgressLevel(ctx, userProgressUpdate); err != nil {
+		return err
+	}
+	defer cancel()
+
+	return nil
+}
+
 func (s *UserService) SetLastLanguage(userId primitive.ObjectID, language string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 

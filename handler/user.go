@@ -103,6 +103,13 @@ func (h *Handler) UpdateProgress(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
 		return
 	}
+
+	if err := h.services.User.SetProgressLevel(updateProgress); err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not set progress"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"updated": "true"})
 }
 
 func (h *Handler) SetLastLanguage(c *gin.Context) {
