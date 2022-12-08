@@ -3,6 +3,7 @@ package db
 import (
 	"Bananza/models"
 	"context"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -17,6 +18,7 @@ type Authorization interface {
 
 type User interface {
 	AddLanguage(ctx context.Context, userProgress *models.UserProgress) (*mongo.InsertOneResult, error)
+	FindUser(ctx context.Context, userId primitive.ObjectID) (*models.User, error)
 }
 
 type Exercise interface {

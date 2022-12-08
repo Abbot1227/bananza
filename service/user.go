@@ -29,9 +29,21 @@ func (s *UserService) AddLanguage(inputLanguage models.InputLanguage) (*mongo.In
 
 	result, err := s.repo.AddLanguage(ctx, userProgress)
 	if err != nil {
-		return result, err
+		return nil, err
 	}
 	defer cancel()
 
 	return result, err
+}
+
+func (s *UserService) FindProfile(userId primitive.ObjectID) (*models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	user, err := s.repo.FindUser(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer cancel()
+
+	return user, nil
 }

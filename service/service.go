@@ -3,6 +3,7 @@ package service
 import (
 	"Bananza/db"
 	"Bananza/models"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -13,6 +14,7 @@ type Authorization interface {
 
 type User interface {
 	AddLanguage(inputLanguage models.InputLanguage) (*mongo.InsertOneResult, error)
+	FindProfile(userId primitive.ObjectID) (*models.User, error)
 }
 
 type Exercise interface {
