@@ -3,8 +3,11 @@ package db
 import (
 	"Bananza/models"
 	"context"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ExerciseMongo struct {
@@ -131,5 +134,35 @@ func (r *ExerciseMongo) GetAudioExercise(ctx context.Context, exerciseDesc model
 	if err = cursor.All(ctx, &exercise); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (r *ExerciseMongo) GetRightAnswer(ctx context.Context, questionId string) (interface{}, error) {
+	var answerStruct bson.D
+	id, _ := primitive.ObjectIDFromHex(questionId)
+	filter := bson.D{{"_id", id}}
+	opts := options.FindOne().SetProjection(bson.D{{"_id", 0}, {"answer", 1}})
+
+	if err := deExercisesCollection.FindOne(ctx, filter, opts).Decode(&answerStruct); err != nil {
+		if err = krExercisesCollection.FindOne(ctx, filter, opts).Decode(&answerStruct); err != nil {
+			return "", err
+		}
+	}
+	answer := answerStruct.Map()
+
+	return answer["answer"], nil
+}
+
+func (r *ExerciseMongo) IncrementProgressLevel(ctx context.Context, languageId string, expToAdd int) error {
+	id, _ := primitive.ObjectIDFromHex(languageId)
+
+	result, err := userProgressCollection.UpdateByID(ctx, id, bson.D{
+		{"$inc", bson.D{{"level", expToAdd}}},
+	})
+	if err != nil {
+		return err
+	}
+	logrus.Println(result)
+
 	return nil
 }

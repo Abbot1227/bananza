@@ -33,7 +33,7 @@ func (s *UserService) AddLanguage(inputLanguage models.InputLanguage) (*mongo.In
 	}
 	defer cancel()
 
-	return result, err
+	return result, nil
 }
 
 func (s *UserService) FindProfiles() (*[]models.User, error) {

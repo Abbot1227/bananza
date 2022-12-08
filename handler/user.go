@@ -124,7 +124,12 @@ func (h *Handler) SetLastLanguage(c *gin.Context) {
 	}
 
 	if lastLanguage.ID == "0" && lastLanguage.LastLanguage == "0" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "try again"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "try again"})
+		return
+	}
+
+	if lastLanguage.LastLanguage == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "try again"})
 		return
 	}
 

@@ -183,6 +183,10 @@ func SetLastLanguage(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "try again"})
 		return
 	}
+	if lastLanguage.LastLanguage == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "try again"})
+		return
+	}
 
 	// Ensure that data we receive is correct
 	validationErr := validate.Struct(&lastLanguage)

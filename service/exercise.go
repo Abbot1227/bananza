@@ -125,6 +125,29 @@ func (s *ExerciseService) GetAudioExercise(exerciseDesc models.AcquireExercise, 
 	return nil
 }
 
+func (s *ExerciseService) GetRightAnswer(questionId string) (interface{}, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	answer, err := s.repo.GetRightAnswer(ctx, questionId)
+	if err != nil {
+		return "", err
+	}
+	defer cancel()
+
+	return answer, nil
+}
+
+func (s *ExerciseService) UpdateProgress(languageId string, expToAdd int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	if err := s.repo.IncrementProgressLevel(ctx, languageId, expToAdd); err != nil {
+		return err
+	}
+	defer cancel()
+
+	return nil
+}
+
 func (s *ExerciseService) checkASRConnection() error {
 	req, err := http.NewRequest("GET", "http://localhost:4040/predict", nil)
 	if err != nil {

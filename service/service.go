@@ -29,6 +29,8 @@ type Exercise interface {
 	GetImageExercise(exerciseDesc models.AcquireExercise, exercise *models.SendImageExercise) error
 	GetImagesExercise(exerciseDesc models.AcquireExercise, exercise *models.SendImagesExercise) error
 	GetAudioExercise(exerciseDesc models.AcquireExercise, exercise *models.SendAudioExercise) error
+	GetRightAnswer(questionId string) (interface{}, error)
+	UpdateProgress(languageId string, expToAdd int) error
 }
 
 type Forum interface {

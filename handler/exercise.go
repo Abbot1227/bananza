@@ -5,7 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"strconv"
 )
+
+var ExpMultiplier = 15
 
 func (h *Handler) SendExercise(c *gin.Context) {
 	var acquireExercise models.AcquireExercise
@@ -93,7 +96,42 @@ func (h *Handler) SendExercise(c *gin.Context) {
 }
 
 func (h *Handler) SendAnswer(c *gin.Context) {
+	var inputAnswer models.InputAnswer
 
+	if err := c.BindJSON(&inputAnswer); err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	logrus.Println(inputAnswer)
+
+	// Ensure that data we receive is correct
+	validationErr := validate.Struct(&inputAnswer)
+	if validationErr != nil {
+		logrus.Error(validationErr.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+		return
+	}
+
+	answer, err := h.services.Exercise.GetRightAnswer(inputAnswer.Answer)
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	expToAdd := calculateGainExp(inputAnswer.Level)
+
+	if inputAnswer.Answer == answer {
+		c.JSON(http.StatusOK, gin.H{"correct": "true", "answer": answer, "exp": expToAdd})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": answer, "exp": 0})
+	}
+
+	if err := h.services.Exercise.UpdateProgress(inputAnswer.LanguageId, expToAdd); err != nil {
+		logrus.Error(err.Error())
+		logrus.Println("could not update user's progress")
+	}
 }
 
 func (h *Handler) LoadAudio(c *gin.Context) {
@@ -113,5 +151,18 @@ func (h *Handler) AddAudioExercise(c *gin.Context) {
 }
 
 func (h *Handler) SetMultiplier(c *gin.Context) {
+	multiplier := c.Query("set")
+	newMultiplier, _ := strconv.Atoi(multiplier)
 
+	ExpMultiplier = newMultiplier
+	c.JSON(http.StatusOK, gin.H{})
+}
+
+// calculateGainExp returns number of experience
+// gained by user after solving question
+func calculateGainExp(level int) int {
+	if level/100 == 0 {
+		return 5
+	}
+	return 1 / (level / (100 - (level / 100))) * ExpMultiplier
 }

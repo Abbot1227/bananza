@@ -34,6 +34,8 @@ type Exercise interface {
 	GetImageExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.ImageExercise) error
 	GetImagesExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.ImagesExercise) error
 	GetAudioExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.AudioExercise) error
+	GetRightAnswer(ctx context.Context, questionId string) (interface{}, error)
+	IncrementProgressLevel(ctx context.Context, languageId string, expToAdd int) error
 }
 
 type Forum interface {
