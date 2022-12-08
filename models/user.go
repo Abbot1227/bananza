@@ -35,3 +35,9 @@ type LanguageUpdate struct {
 	Level    int    `json:"level"`
 	User     string `json:"user"`
 }
+
+type UserProgressUpdate struct {
+	Language string `json:"language"`
+	User     string `json:"user"`
+	level    int    `json:"level"`
+}

@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"net/http"
 )
 
 var validate = validator.New()
@@ -22,6 +23,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(cors.Default())
+
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"health": "is working"})
+	})
 
 	// Endpoints for user authentication and progress
 	user := router.Group("/users")

@@ -14,7 +14,11 @@ type Authorization interface {
 
 type User interface {
 	AddLanguage(inputLanguage models.InputLanguage) (*mongo.InsertOneResult, error)
+	FindProfiles() (*[]models.User, error)
 	FindProfile(userId primitive.ObjectID) (*models.User, error)
+	FindProgress(userId primitive.ObjectID, language string) (*models.UserProgress, error)
+	FindProgresses(userId primitive.ObjectID) (*[]models.UserProgress, error)
+	SetLastLanguage(userId primitive.ObjectID, language string) error
 }
 
 type Exercise interface {

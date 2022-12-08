@@ -36,6 +36,18 @@ func (s *UserService) AddLanguage(inputLanguage models.InputLanguage) (*mongo.In
 	return result, err
 }
 
+func (s *UserService) FindProfiles() (*[]models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	users, err := s.repo.FindUsers(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer cancel()
+
+	return users, nil
+}
+
 func (s *UserService) FindProfile(userId primitive.ObjectID) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
@@ -46,4 +58,39 @@ func (s *UserService) FindProfile(userId primitive.ObjectID) (*models.User, erro
 	defer cancel()
 
 	return user, nil
+}
+
+func (s *UserService) FindProgress(userId primitive.ObjectID, language string) (*models.UserProgress, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	progress, err := s.repo.FindProgress(ctx, userId, language)
+	if err != nil {
+		return nil, err
+	}
+	defer cancel()
+
+	return progress, nil
+}
+
+func (s *UserService) FindProgresses(userId primitive.ObjectID) (*[]models.UserProgress, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	progresses, err := s.repo.FindProgresses(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer cancel()
+
+	return progresses, nil
+}
+
+func (s *UserService) SetLastLanguage(userId primitive.ObjectID, language string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	if err := s.repo.SetLastLanguage(ctx, userId, language); err != nil {
+		return err
+	}
+	defer cancel()
+
+	return nil
 }
