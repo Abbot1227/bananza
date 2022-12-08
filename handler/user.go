@@ -4,6 +4,7 @@ import (
 	"Bananza/models"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 )
 
@@ -37,7 +38,16 @@ func (h *Handler) UserProfiles(c *gin.Context) {
 }
 
 func (h *Handler) UserProfile(c *gin.Context) {
+	user := c.Params.ByName("id")
+	userId, _ := primitive.ObjectIDFromHex(user[3:])
 
+	profile, err := h.services.User.FindProfile(userId)
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get user profile"})
+		return
+	}
+	c.JSON(http.StatusOK, profile)
 }
 
 func (h *Handler) UserProgress(c *gin.Context) {
