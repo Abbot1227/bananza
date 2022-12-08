@@ -138,18 +138,6 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 
 }
 
-func (h *Handler) AddTextImageExercise(c *gin.Context) {
-
-}
-
-func (h *Handler) AddImagesExercise(c *gin.Context) {
-
-}
-
-func (h *Handler) AddAudioExercise(c *gin.Context) {
-
-}
-
 func (h *Handler) SetMultiplier(c *gin.Context) {
 	multiplier := c.Query("set")
 	newMultiplier, _ := strconv.Atoi(multiplier)
