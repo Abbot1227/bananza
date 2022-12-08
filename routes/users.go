@@ -183,6 +183,10 @@ func SetLastLanguage(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "try again"})
 		return
 	}
+	if lastLanguage.LastLanguage == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "try again"})
+		return
+	}
 
 	// Ensure that data we receive is correct
 	validationErr := validate.Struct(&lastLanguage)
@@ -192,6 +196,8 @@ func SetLastLanguage(c *gin.Context) {
 		return
 	}
 
+	// -----------------------------------------------------------------
+	//						SET LAST LANGUAGE
 	update := bson.D{
 		{"$set",
 			bson.D{
@@ -206,6 +212,8 @@ func SetLastLanguage(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		defer cancel()
 	}
+	// ------------------------------------------------------------------
+	//				CREATE IF DOES NOT EXIST AND GET LANGUAGE PROGRESS
 
 	filter := bson.D{
 		{"$and",
@@ -240,6 +248,8 @@ func SetLastLanguage(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
+
+	// -----------------------------------------------------------------
 	defer cancel()
 	fmt.Println("USER PROGRESS:", languageProgress)
 

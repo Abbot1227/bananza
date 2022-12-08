@@ -139,13 +139,6 @@ func SendAnswer(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("This is answer:")
-	fmt.Println(inputAnswer.ID)
-	fmt.Println(inputAnswer.Answer)
-	fmt.Println(inputAnswer.LanguageId)
-	fmt.Println(inputAnswer.Level)
-	fmt.Println("End")
-
 	var answerStruct bson.D
 	questionId, _ := primitive.ObjectIDFromHex(inputAnswer.ID)
 	filter := bson.D{{"_id", questionId}}
@@ -160,17 +153,15 @@ func SendAnswer(c *gin.Context) {
 	defer cancel()
 	answer := answerStruct.Map()
 
-	expToAdd := calculateGainExp(inputAnswer.Level)
-
 	fmt.Println(questionId)
 	fmt.Println("Right:", answer["answer"])
 	fmt.Println("User:", inputAnswer.Answer)
 
-	// Добавить прибавление очков пользователю за правильный ответ
+	expToAdd := calculateGainExp(inputAnswer.Level)
+
 	if inputAnswer.Answer == answer["answer"] {
 		c.JSON(http.StatusOK, gin.H{"correct": "true", "answer": answer["answer"], "exp": expToAdd})
 	} else {
-
 		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": answer["answer"], "exp": 0})
 		return
 	}

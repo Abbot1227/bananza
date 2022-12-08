@@ -56,7 +56,7 @@ func main() {
 	exercise := router.Group("/exercises")
 	{
 		// C
-		exercise.POST("/new", routes.SendExercise)
+		exercise.POST("/new", routes.SendExercise) // Done
 		exercise.POST("/answer", routes.SendAnswer)
 		exercise.POST("/audio/:lang", routes.LoadAudio)
 		exercise.POST("add/teximg/:lang", routes.AddTextImageExercise)
