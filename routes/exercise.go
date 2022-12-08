@@ -15,6 +15,7 @@ import (
 	"time"
 )
 
+var ExpMultiplier = 15
 var tempExercisesCollection = db.OpenCollection(db.Client, "tempExercises")
 var deExercisesCollection = db.OpenCollection(db.Client, "deExercises")
 var krExercisesCollection = db.OpenCollection(db.Client, "krExercises")
@@ -484,7 +485,7 @@ func calculateGainExp(level int) int {
 	if level/100 == 0 {
 		return 5
 	}
-	return 1 / (level / (100 - (level / 100))) * 15
+	return 1 / (level / (100 - (level / 100))) * ExpMultiplier
 }
 
 func checkASRConnection() error {

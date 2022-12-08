@@ -24,4 +24,24 @@ func (h *Handler) AuthenticateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
 		return
 	}
+
+	user, err := h.services.Authorization.AuthenticateUser(token)
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "user was not created"})
+		return
+	}
+
+	if user.LastLanguage == "" {
+		c.JSON(http.StatusOK, gin.H{"user": user})
+		return
+	}
+
+	lastLanguageProgress, err := h.services.GetLastLanguage(user)
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get last language"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"user": user, "last_language": lastLanguageProgress})
 }

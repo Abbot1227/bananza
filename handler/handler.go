@@ -26,7 +26,18 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	// Endpoints for user authentication and progress
 	user := router.Group("/users")
 	{
-		user.POST("/login", routes.AuthenticateUser)
+		// C
+		user.POST("/login", routes.AuthenticateUser) // Done
+		user.POST("/progress", routes.AddLanguage)   // Done add middlewares check if language exists and user exists or not
+		// R
+		user.GET("/", routes.UserProfiles)               // Done add middlewares authorization only admin
+		user.GET("/:id", routes.UserProfile)             // Done authorization only admin
+		user.GET("/progresslang", routes.UserProgress)   // Done add middlewares authorization only admin проверить что только юзер с тем id может запрашивать свои
+		user.GET("/progress/:id", routes.UserProgresses) // Done add middlewares authorization only admin проверить что только юзер с тем id может запрашивать свои
+		// U
+		user.PUT("/progress", routes.UpdateProgress) // Test add middlewares check if exists
+		user.PUT("/lastlang", routes.SetLastLanguage)
+		// TODO delete progress and-or user
 	}
 
 	return router

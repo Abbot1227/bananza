@@ -59,15 +59,15 @@ func main() {
 		exercise.POST("/new", routes.SendExercise)
 		exercise.POST("/answer", routes.SendAnswer)
 		exercise.POST("/audio/:lang", routes.LoadAudio)
+		exercise.POST("add/teximg/:lang", routes.AddTextImageExercise)
+		exercise.POST("add/imgs/:lang", routes.AddImagesExercise)
+		exercise.POST("add/audio/:lang", routes.AddAudioExercise)
 	}
 
-	addExercise := exercise.Group("/add")
-	addExercise.Use() // TODO add authorization middleware
+	forum := router.Group("/forum")
 	{
-		// C
-		addExercise.POST("/teximg/:lang", routes.AddTextImageExercise)
-		addExercise.POST("/imgs/:lang", routes.AddImagesExercise)
-		addExercise.POST("/audio/:lang", routes.AddAudioExercise)
+		forum.POST("")
+		forum.GET("/")
 	}
 
 	router.Run(":8080")
