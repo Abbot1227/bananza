@@ -45,9 +45,10 @@ func SendExercise(c *gin.Context) {
 	exerciseType := generateRandomType()
 	level := acquireExercise.Exp / 100
 
-	if err := checkASRConnection(); err != nil {
-		exerciseType = 0
-	}
+	// Disabled during test period since there is no connection with ASR model API
+	//if err := checkASRConnection(); err != nil {
+	//	exerciseType = 0
+	//}
 
 	if acquireExercise.Lang == "de" {
 		// TODO do nothing
