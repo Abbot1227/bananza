@@ -66,7 +66,7 @@ func main() {
 
 	forum := router.Group("/forum")
 	{
-		forum.POST("")
+		forum.POST("/")
 		forum.GET("/")
 	}
 

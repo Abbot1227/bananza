@@ -39,19 +39,32 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		user.PUT("/progress", h.UpdateProgress)  // Test add middlewares check if exists
 		user.PUT("/lastlang", h.SetLastLanguage) // Done
 		// D
+		user.DELETE("/:id", h.RemoveUser) // Done
 	}
 
 	exercise := router.Group("/exercises")
 	{
 		// C
-		exercise.POST("/new", h.SendExercise)
-		exercise.POST("/answer", h.SendAnswer)
+		exercise.POST("/new", h.SendExercise)  // Done
+		exercise.POST("/answer", h.SendAnswer) //Done
 		exercise.POST("/audio/:lang", h.LoadAudio)
-		exercise.POST("add/teximg/:lang", h.AddTextImageExercise)
-		exercise.POST("add/imgs/:lang", h.AddImagesExercise)
-		exercise.POST("add/audio/:lang", h.AddAudioExercise)
+		exercise.POST("add/teximg/:lang", h.AddTextImageExercise) // Done
+		exercise.POST("add/imgs/:lang", h.AddImagesExercise)      // Done
+		exercise.POST("add/audio/:lang", h.AddAudioExercise)      // Done
 		// R
 		exercise.GET("/mul", h.SetMultiplier)
+	}
+
+	forum := router.Group("/forum")
+	{
+		// C
+		forum.POST("/")
+		// R
+		forum.GET("/")
+		// U
+		forum.PUT("/")
+		// D
+		forum.DELETE("/")
 	}
 
 	return router

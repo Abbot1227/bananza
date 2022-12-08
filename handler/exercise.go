@@ -135,19 +135,30 @@ func (h *Handler) SendAnswer(c *gin.Context) {
 }
 
 func (h *Handler) LoadAudio(c *gin.Context) {
+	// The FormFile function takes in the POST input id file
+	c.Request.ParseMultipartForm(32 << 20)
 
-}
+	languageParam := c.Params.ByName("lang")
+	language := languageParam[5:]
 
-func (h *Handler) AddTextImageExercise(c *gin.Context) {
+	questionId := c.Request.MultipartForm.Value["id"]
+	languageId := c.Request.MultipartForm.Value["languageId"]
+	level := c.Request.MultipartForm.Value["level"]
+	file, _, err := c.Request.FormFile("mp3")
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer file.Close()
 
-}
-
-func (h *Handler) AddImagesExercise(c *gin.Context) {
-
-}
-
-func (h *Handler) AddAudioExercise(c *gin.Context) {
-
+	// TODO Остановился здесь
+	answer, err := h.services.Exercise.GetRightAnswer(inputAnswer.Answer)
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 }
 
 func (h *Handler) SetMultiplier(c *gin.Context) {

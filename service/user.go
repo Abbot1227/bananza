@@ -105,3 +105,14 @@ func (s *UserService) SetLastLanguage(userId primitive.ObjectID, language string
 
 	return nil
 }
+
+func (s *UserService) DeleteProfile(userId primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	if err := s.repo.DeleteProfile(ctx, userId); err != nil {
+		return err
+	}
+	defer cancel()
+
+	return nil
+}

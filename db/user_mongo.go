@@ -117,3 +117,22 @@ func (r *UserMongo) SetLastLanguage(ctx context.Context, userId primitive.Object
 	logrus.Println(result)
 	return nil
 }
+
+func (r *UserMongo) DeleteProfile(ctx context.Context, userId primitive.ObjectID) error {
+	progressFilter := bson.D{{"user", userId}}
+	userFilter := bson.D{{"_id", userId}}
+
+	results, err := userProgressCollection.DeleteMany(ctx, progressFilter)
+	if err != nil {
+		return err
+	}
+	logrus.Println(results)
+
+	result, err := usersCollection.DeleteOne(ctx, userFilter)
+	if err != nil {
+		return err
+	}
+	logrus.Println(result)
+
+	return nil
+}

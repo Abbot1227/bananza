@@ -26,6 +26,7 @@ type User interface {
 	FindProgresses(ctx context.Context, userId primitive.ObjectID) (*[]models.UserProgress, error)
 	SetProgressLevel(ctx context.Context, userProgressUpdate models.UserProgressUpdate) error
 	SetLastLanguage(ctx context.Context, userId primitive.ObjectID, language string) error
+	DeleteProfile(ctx context.Context, userId primitive.ObjectID) error
 }
 
 type Exercise interface {
@@ -36,6 +37,9 @@ type Exercise interface {
 	GetAudioExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.AudioExercise) error
 	GetRightAnswer(ctx context.Context, questionId string) (interface{}, error)
 	IncrementProgressLevel(ctx context.Context, languageId string, expToAdd int) error
+	CreateTextImageExercise(ctx context.Context, exercise models.TextExercise, language string) error
+	CreateImagesExercise(ctx context.Context, exercise models.ImagesExercise, language string) error
+	CreateAudioExercise(ctx context.Context, exercise models.AudioExercise, language string) error
 }
 
 type Forum interface {

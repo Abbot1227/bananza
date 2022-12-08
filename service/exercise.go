@@ -148,6 +148,39 @@ func (s *ExerciseService) UpdateProgress(languageId string, expToAdd int) error 
 	return nil
 }
 
+func (s *ExerciseService) CreateTextImageExercise(exercise models.TextExercise, language string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	if err := s.repo.CreateTextImageExercise(ctx, exercise, language); err != nil {
+		return err
+	}
+	defer cancel()
+
+	return nil
+}
+
+func (s *ExerciseService) CreateImagesExercise(exercise models.ImagesExercise, language string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	if err := s.repo.CreateImagesExercise(ctx, exercise, language); err != nil {
+		return err
+	}
+	defer cancel()
+
+	return nil
+}
+
+func (s *ExerciseService) CreateAudioExercise(exercise models.AudioExercise, language string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	if err := s.repo.CreateAudioExercise(ctx, exercise, language); err != nil {
+		return err
+	}
+	defer cancel()
+
+	return nil
+}
+
 func (s *ExerciseService) checkASRConnection() error {
 	req, err := http.NewRequest("GET", "http://localhost:4040/predict", nil)
 	if err != nil {

@@ -20,6 +20,7 @@ type User interface {
 	FindProgresses(userId primitive.ObjectID) (*[]models.UserProgress, error)
 	SetProgressLevel(userProgressUpdate models.UserProgressUpdate) error
 	SetLastLanguage(userId primitive.ObjectID, language string) error
+	DeleteProfile(userId primitive.ObjectID) error
 }
 
 type Exercise interface {
@@ -31,6 +32,9 @@ type Exercise interface {
 	GetAudioExercise(exerciseDesc models.AcquireExercise, exercise *models.SendAudioExercise) error
 	GetRightAnswer(questionId string) (interface{}, error)
 	UpdateProgress(languageId string, expToAdd int) error
+	CreateTextImageExercise(exercise models.TextExercise, language string) error
+	CreateImagesExercise(exercise models.ImagesExercise, language string) error
+	CreateAudioExercise(exercise models.AudioExercise, language string) error
 }
 
 type Forum interface {

@@ -169,3 +169,16 @@ func (h *Handler) SetLastLanguage(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, languageProgress)
 }
+
+func (h *Handler) RemoveUser(c *gin.Context) {
+	user := c.Query("id")
+	userId, _ := primitive.ObjectIDFromHex(user)
+	logrus.Println(user)
+
+	if err := h.services.User.DeleteProfile(userId); err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get remove profile"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "deleted"})
+}

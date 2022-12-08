@@ -166,3 +166,66 @@ func (r *ExerciseMongo) IncrementProgressLevel(ctx context.Context, languageId s
 
 	return nil
 }
+
+func (r *ExerciseMongo) CreateTextImageExercise(ctx context.Context, exercise models.TextExercise, language string) error {
+	objectId := primitive.NewObjectID()
+	exercise.ID = objectId
+
+	var languageCollection *mongo.Collection
+
+	if language == "de" {
+		languageCollection = deExercisesCollection
+	} else {
+		languageCollection = krExercisesCollection
+	}
+
+	result, err := languageCollection.InsertOne(ctx, &exercise)
+	if err != nil {
+		return err
+	}
+	logrus.Println(result)
+
+	return nil
+}
+
+func (r *ExerciseMongo) CreateImagesExercise(ctx context.Context, exercise models.ImagesExercise, language string) error {
+	objectId := primitive.NewObjectID()
+	exercise.ID = objectId
+
+	var languageCollection *mongo.Collection
+
+	if language == "de" {
+		languageCollection = deExercisesCollection
+	} else {
+		languageCollection = krExercisesCollection
+	}
+
+	result, err := languageCollection.InsertOne(ctx, &exercise)
+	if err != nil {
+		return err
+	}
+	logrus.Println(result)
+
+	return nil
+}
+
+func (r *ExerciseMongo) CreateAudioExercise(ctx context.Context, exercise models.AudioExercise, language string) error {
+	objectId := primitive.NewObjectID()
+	exercise.ID = objectId
+
+	var languageCollection *mongo.Collection
+
+	if language == "de" {
+		languageCollection = deExercisesCollection
+	} else {
+		languageCollection = krExercisesCollection
+	}
+
+	result, err := languageCollection.InsertOne(ctx, &exercise)
+	if err != nil {
+		return err
+	}
+	logrus.Println(result)
+
+	return nil
+}
