@@ -154,7 +154,7 @@ func SendAnswer(c *gin.Context) {
 	defer cancel()
 	answer := answerStruct.Map()
 
-	fmt.Println(questionId)
+	fmt.Println(inputAnswer)
 	fmt.Println("Right:", answer["answer"])
 	fmt.Println("User:", inputAnswer.Answer)
 
