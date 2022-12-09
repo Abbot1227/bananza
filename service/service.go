@@ -3,6 +3,8 @@ package service
 import (
 	"Bananza/db"
 	"Bananza/models"
+	"mime/multipart"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -35,6 +37,7 @@ type Exercise interface {
 	CreateTextImageExercise(exercise models.TextExercise, language string) error
 	CreateImagesExercise(exercise models.ImagesExercise, language string) error
 	CreateAudioExercise(exercise models.AudioExercise, language string) error
+	GetAudioAnswer(file multipart.File, language string) (interface{}, error)
 }
 
 type Forum interface {

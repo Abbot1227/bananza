@@ -2,10 +2,11 @@ package handler
 
 import (
 	"Bananza/models"
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 var ExpMultiplier = 15
@@ -126,6 +127,7 @@ func (h *Handler) SendAnswer(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"correct": "true", "answer": answer, "exp": expToAdd})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": answer, "exp": 0})
+		return
 	}
 
 	if err := h.services.Exercise.UpdateProgress(inputAnswer.LanguageId, expToAdd); err != nil {
@@ -153,11 +155,36 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 	defer file.Close()
 
 	// TODO Остановился здесь
-	answer, err := h.services.Exercise.GetRightAnswer(inputAnswer.Answer)
+	userAnswer, err := h.services.Exercise.GetAudioAnswer(file, language)
 	if err != nil {
 		logrus.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+
+	// Get right answer for user question
+	rightAnswer, err := h.services.Exercise.GetRightAnswer(questionId[0])
+	if err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	logrus.Println(userAnswer, " ", rightAnswer)
+
+	exp, _ := strconv.Atoi(level[0])
+	expToAdd := calculateGainExp(exp)
+
+	if userAnswer == rightAnswer {
+		c.JSON(http.StatusOK, gin.H{"correct": "true", "answer": rightAnswer, "exp": expToAdd})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": rightAnswer, "exp": 0})
+		return
+	}
+
+	if err := h.services.Exercise.UpdateProgress(languageId[0], expToAdd); err != nil {
+		logrus.Error(err.Error())
+		logrus.Println("could not update user's progress")
 	}
 }
 

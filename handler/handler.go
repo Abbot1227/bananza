@@ -2,10 +2,11 @@ package handler
 
 import (
 	"Bananza/service"
+	"net/http"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"net/http"
 )
 
 var validate = validator.New()
@@ -36,7 +37,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		user.GET("/progresslang", h.UserProgress)   // Done add middlewares authorization only admin проверить что только юзер с тем id может запрашивать свои
 		user.GET("/progress/:id", h.UserProgresses) // Done add middlewares authorization only admin проверить что только юзер с тем id может запрашивать свои
 		// U
-		user.PUT("/progress", h.UpdateProgress)  // Test add middlewares check if exists
+		user.PUT("/progress", h.UpdateProgress)  // Done Test add middlewares check if exists
 		user.PUT("/lastlang", h.SetLastLanguage) // Done
 		// D
 		user.DELETE("/:id", h.RemoveUser) // Done
@@ -45,9 +46,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	exercise := router.Group("/exercises")
 	{
 		// C
-		exercise.POST("/new", h.SendExercise)  // Done
-		exercise.POST("/answer", h.SendAnswer) //Done
-		exercise.POST("/audio/:lang", h.LoadAudio)
+		exercise.POST("/new", h.SendExercise)                     // Done
+		exercise.POST("/answer", h.SendAnswer)                    //Done
+		exercise.POST("/audio/:lang", h.LoadAudio)                // Done
 		exercise.POST("add/teximg/:lang", h.AddTextImageExercise) // Done
 		exercise.POST("add/imgs/:lang", h.AddImagesExercise)      // Done
 		exercise.POST("add/audio/:lang", h.AddAudioExercise)      // Done

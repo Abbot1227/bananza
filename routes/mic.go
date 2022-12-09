@@ -5,15 +5,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var client = &http.Client{}
@@ -49,6 +50,7 @@ func LoadAudio(c *gin.Context) {
 		return
 	}
 
+	// next service
 	var answerStruct bson.D
 	question, _ := primitive.ObjectIDFromHex(questionId[0])
 	filter := bson.D{{"_id", question}}
@@ -62,6 +64,7 @@ func LoadAudio(c *gin.Context) {
 	}
 	defer cancel()
 	rightAnswer := answerStruct.Map()
+	// finish
 
 	exp, _ := strconv.Atoi(level[0])
 	expToAdd := calculateGainExp(exp)
@@ -76,6 +79,8 @@ func LoadAudio(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": rightAnswer["answer"], "exp": 0})
 		return
 	}
+
+	// last one
 
 	langId, _ := primitive.ObjectIDFromHex(languageId[0])
 

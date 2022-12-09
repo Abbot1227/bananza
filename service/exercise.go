@@ -3,11 +3,17 @@ package service
 import (
 	"Bananza/db"
 	"Bananza/models"
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"math/rand"
+	"mime/multipart"
 	"net/http"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type ExerciseService struct {
@@ -181,6 +187,21 @@ func (s *ExerciseService) CreateAudioExercise(exercise models.AudioExercise, lan
 	return nil
 }
 
+func (s *ExerciseService) GetAudioAnswer(file multipart.File, language string) (interface{}, error) {
+	_, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	// Stores response from ASR model
+	var response map[string]interface{}
+
+	if err := s.sendPostRequest(file, &response, language); err != nil {
+		return nil, err
+	}
+	defer cancel()
+	logrus.Println(response)
+
+	return response["text"], nil
+}
+
 func (s *ExerciseService) checkASRConnection() error {
 	req, err := http.NewRequest("GET", "http://localhost:4040/predict", nil)
 	if err != nil {
@@ -203,4 +224,53 @@ func (s *ExerciseService) generateRandomType(last int) int {
 	max := last
 
 	return rand.Intn(max-min+1) + min
+}
+
+func (s *ExerciseService) sendPostRequest(file multipart.File, temp *map[string]interface{}, language string) error {
+	b := &bytes.Buffer{}
+	w := multipart.NewWriter(b)
+
+	filename := s.createAudioFilename(language)
+	fw, err := w.CreateFormFile("uploaded_file", filename)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(fw, file)
+	if err != nil {
+		return err
+	}
+	w.Close()
+
+	req, err := http.NewRequest("POST", "http://localhost:4040/predict", bytes.NewReader(b.Bytes()))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", w.FormDataContentType())
+
+	res, _ := s.client.Do(req)
+	if res.StatusCode != http.StatusOK {
+		err = fmt.Errorf("bad status: %s", res.Status)
+		return err
+	}
+	defer res.Body.Close()
+
+	cnt, err := io.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	if err := json.Unmarshal(cnt, &temp); err != nil {
+		logrus.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// createAudioFilename is a function to generate audio file name
+func (s *ExerciseService) createAudioFilename(language string) string {
+	// language - de, kr
+	filename := language + "_audio" + time.Now().Format("01022006150405") + ".mp3"
+	return filename
 }
