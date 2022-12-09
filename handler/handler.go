@@ -53,7 +53,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		exercise.POST("add/imgs/:lang", h.AddImagesExercise)      // Done
 		exercise.POST("add/audio/:lang", h.AddAudioExercise)      // Done
 		// R
-		exercise.GET("/mul", h.SetMultiplier)
+		exercise.GET("/mul", h.SetMultiplier) // Done
 	}
 
 	forum := router.Group("/forum")
@@ -61,11 +61,17 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		// C
 		forum.POST("/")
 		// R
-		forum.GET("/")
+		forum.GET("/", h.ForumArticles)
 		// U
 		forum.PUT("/")
 		// D
 		forum.DELETE("/")
+	}
+
+	grammar := router.Group("/grammar")
+	{
+		grammar.GET("/")
+		grammar.GET("/")
 	}
 
 	return router
