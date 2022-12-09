@@ -36,7 +36,7 @@ type Exercise interface {
 	GetImagesExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.ImagesExercise) error
 	GetAudioExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.AudioExercise) error
 	GetRightAnswer(ctx context.Context, questionId string) (interface{}, error)
-	IncrementProgressLevel(ctx context.Context, languageId string, expToAdd int) error
+	IncrementProgressLevel(ctx context.Context, languageId string, expToAdd float64) error
 	CreateTextImageExercise(ctx context.Context, exercise models.TextExercise, language string) error
 	CreateImagesExercise(ctx context.Context, exercise models.ImagesExercise, language string) error
 	CreateAudioExercise(ctx context.Context, exercise models.AudioExercise, language string) error
@@ -53,5 +53,9 @@ type Repository struct {
 }
 
 func NewRepository() *Repository {
-	return &Repository{}
+	return &Repository{
+		Authorization: NewAuthMongo(),
+		User:          NewUserMongo(),
+		Exercise:      NewExerciseMongo(),
+	}
 }

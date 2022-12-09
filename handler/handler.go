@@ -47,7 +47,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		// C
 		exercise.POST("/new", h.SendExercise)                     // Done
-		exercise.POST("/answer", h.SendAnswer)                    //Done
+		exercise.POST("/answer", h.SendAnswer)                    // Done
 		exercise.POST("/audio/:lang", h.LoadAudio)                // Done
 		exercise.POST("add/teximg/:lang", h.AddTextImageExercise) // Done
 		exercise.POST("add/imgs/:lang", h.AddImagesExercise)      // Done
@@ -70,7 +70,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	grammar := router.Group("/grammar")
 	{
-		grammar.GET("/")
 		grammar.GET("/")
 	}
 

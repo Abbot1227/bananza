@@ -143,7 +143,7 @@ func (s *ExerciseService) GetRightAnswer(questionId string) (interface{}, error)
 	return answer, nil
 }
 
-func (s *ExerciseService) UpdateProgress(languageId string, expToAdd int) error {
+func (s *ExerciseService) UpdateProgress(languageId string, expToAdd float64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
 	if err := s.repo.IncrementProgressLevel(ctx, languageId, expToAdd); err != nil {

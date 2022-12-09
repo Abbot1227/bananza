@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var ExpMultiplier = 15
+var ExpMultiplier = 50
 
 func (h *Handler) SendExercise(c *gin.Context) {
 	var acquireExercise models.AcquireExercise
@@ -198,9 +198,9 @@ func (h *Handler) SetMultiplier(c *gin.Context) {
 
 // calculateGainExp returns number of experience
 // gained by user after solving question
-func calculateGainExp(level int) int {
+func calculateGainExp(level int) float64 {
 	if level/100 == 0 {
 		return 5
 	}
-	return 1 / (level / (100 - (level / 100))) * ExpMultiplier
+	return (100 / float64(level)) * float64(ExpMultiplier)
 }

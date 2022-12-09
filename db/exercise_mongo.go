@@ -153,7 +153,7 @@ func (r *ExerciseMongo) GetRightAnswer(ctx context.Context, questionId string) (
 	return answer["answer"], nil
 }
 
-func (r *ExerciseMongo) IncrementProgressLevel(ctx context.Context, languageId string, expToAdd int) error {
+func (r *ExerciseMongo) IncrementProgressLevel(ctx context.Context, languageId string, expToAdd float64) error {
 	id, _ := primitive.ObjectIDFromHex(languageId)
 
 	result, err := userProgressCollection.UpdateByID(ctx, id, bson.D{

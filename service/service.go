@@ -33,7 +33,7 @@ type Exercise interface {
 	GetImagesExercise(exerciseDesc models.AcquireExercise, exercise *models.SendImagesExercise) error
 	GetAudioExercise(exerciseDesc models.AcquireExercise, exercise *models.SendAudioExercise) error
 	GetRightAnswer(questionId string) (interface{}, error)
-	UpdateProgress(languageId string, expToAdd int) error
+	UpdateProgress(languageId string, expToAdd float64) error
 	CreateTextImageExercise(exercise models.TextExercise, language string) error
 	CreateImagesExercise(exercise models.ImagesExercise, language string) error
 	CreateAudioExercise(exercise models.AudioExercise, language string) error
@@ -50,7 +50,9 @@ type Service struct {
 	Forum
 }
 
-func NewService() *Service {
-	return &Service{Authorization: NewAuthService(db.NewAuthMongo()),
-		User: NewUserService(db.NewUserMongo())}
+func NewService(repos *db.Repository) *Service {
+	return &Service{Authorization: NewAuthService(repos.Authorization),
+		User:     NewUserService(repos.User),
+		Exercise: NewExerciseService(repos.Exercise),
+	}
 }
