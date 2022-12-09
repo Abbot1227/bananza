@@ -4,6 +4,7 @@ import (
 	"Bananza/routes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -70,6 +71,8 @@ func main() {
 		forum.GET("/")
 	}
 
+	logrus.Error("nigger")
+	logrus.Println("nigger")
 	router.Run(":8080")
 	//router.RunTLS(":8080", "cert.pem", "key.pem")
 }
