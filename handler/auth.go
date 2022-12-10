@@ -40,7 +40,7 @@ func (h *Handler) AuthenticateUser(c *gin.Context) {
 	lastLanguageProgress, err := h.services.GetLastLanguage(user)
 	if err != nil {
 		logrus.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get last language"})
+		c.JSON(http.StatusInternalServerError, gin.H{"user": user, "last_language": "could not get last language"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"user": user, "last_language": lastLanguageProgress})
