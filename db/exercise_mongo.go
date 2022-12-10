@@ -35,7 +35,7 @@ func (r *ExerciseMongo) GetEnLnExercise(ctx context.Context, exerciseDesc models
 		return err
 	}
 
-	if err = cursor.All(ctx, &exercise); err != nil {
+	if err = cursor.All(ctx, exercise); err != nil {
 		return err
 	}
 	return nil
@@ -59,7 +59,7 @@ func (r *ExerciseMongo) GetLnEnExercise(ctx context.Context, exerciseDesc models
 		return err
 	}
 
-	if err = cursor.All(ctx, &exercise); err != nil {
+	if err = cursor.All(ctx, exercise); err != nil {
 		return err
 	}
 	return nil
@@ -83,7 +83,7 @@ func (r *ExerciseMongo) GetImageExercise(ctx context.Context, exerciseDesc model
 		return err
 	}
 
-	if err = cursor.All(ctx, &exercise); err != nil {
+	if err = cursor.All(ctx, exercise); err != nil {
 		return err
 	}
 	return nil
@@ -107,7 +107,7 @@ func (r *ExerciseMongo) GetImagesExercise(ctx context.Context, exerciseDesc mode
 		return err
 	}
 
-	if err = cursor.All(ctx, &exercise); err != nil {
+	if err = cursor.All(ctx, exercise); err != nil {
 		return err
 	}
 	return nil
@@ -131,7 +131,7 @@ func (r *ExerciseMongo) GetAudioExercise(ctx context.Context, exerciseDesc model
 		return err
 	}
 
-	if err = cursor.All(ctx, &exercise); err != nil {
+	if err = cursor.All(ctx, exercise); err != nil {
 		return err
 	}
 	return nil
