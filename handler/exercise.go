@@ -154,7 +154,7 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 	}
 	defer file.Close()
 
-	// TODO Остановился здесь
+	// Get user answer in text format
 	userAnswer, err := h.services.Exercise.GetAudioAnswer(file, language)
 	if err != nil {
 		logrus.Error(err.Error())

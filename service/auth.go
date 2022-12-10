@@ -24,7 +24,7 @@ func NewAuthService(repo db.Authorization) *AuthService {
 func (s *AuthService) AuthenticateUser(token models.AuthToken) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
-	var user *models.User
+	var user models.User
 
 	// Getting user google account info from Google api
 	userInfo, err := getUserInfo(token.Token)
@@ -34,7 +34,7 @@ func (s *AuthService) AuthenticateUser(token models.AuthToken) (*models.User, er
 	userId := userInfo.Id
 	defer cancel()
 
-	if err = s.repo.FindUser(ctx, userId, user); err != nil {
+	if err = s.repo.FindUser(ctx, userId, &user); err != nil {
 		if err != mongo.ErrNoDocuments {
 			logrus.Error("nigger serv 1", err.Error())
 			return nil, err
@@ -59,25 +59,25 @@ func (s *AuthService) AuthenticateUser(token models.AuthToken) (*models.User, er
 		user.Balance = 0
 
 		// Inserting new user into database
-		if err = s.repo.CreateUser(ctx, user); err != nil {
+		if err = s.repo.CreateUser(ctx, &user); err != nil {
 			logrus.Error("nigger serv 3", err.Error())
 			return nil, err
 		}
-		return user, nil
+		return &user, nil
 	}
-	return user, nil
+	return &user, nil
 }
 
 func (s *AuthService) GetLastLanguage(user *models.User) (*models.UserProgress, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
-	var lastLanguageProgress *models.UserProgress
+	var lastLanguageProgress models.UserProgress
 	defer cancel()
 
-	if err := s.repo.FindLanguage(ctx, user, lastLanguageProgress); err != nil {
+	if err := s.repo.FindLanguage(ctx, user, &lastLanguageProgress); err != nil {
 		return nil, err
 	}
-	return lastLanguageProgress, nil
+	return &lastLanguageProgress, nil
 }
 
 // getUserInfo is a function TODO add description

@@ -21,6 +21,7 @@ func (r *AuthMongo) FindUser(ctx context.Context, ID string, user *models.User) 
 	// Obtain user info from users collection and store it in user object
 	// if not found return error otherwise return nil
 	if err := usersCollection.FindOne(ctx, filter).Decode(user); err != nil {
+		logrus.Println(user)
 		return err
 	}
 	return nil
