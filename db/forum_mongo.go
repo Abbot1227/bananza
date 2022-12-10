@@ -71,3 +71,14 @@ func (r *ForumMongo) CreateComment(ctx context.Context, forumComment *models.For
 	logrus.Println(result)
 	return nil
 }
+
+func (r *ForumMongo) DeletePost(ctx context.Context, postId primitive.ObjectID) error {
+	filter := bson.D{{"_id", postId}}
+
+	result, err := postsCollection.DeleteOne(ctx, filter)
+	if err != nil {
+		return nil
+	}
+	logrus.Println(result)
+	return nil
+}

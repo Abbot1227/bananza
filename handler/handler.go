@@ -66,7 +66,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		// U
 		forum.PUT("/post/:id", h.AddComment) // Done
 		// D
-		forum.DELETE("/post/:id", h.RemovePost) // Delete post
+		forum.DELETE("/post/:id", h.RemovePost) // Done
 	}
 
 	grammar := router.Group("/grammar")

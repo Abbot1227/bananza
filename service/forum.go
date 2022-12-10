@@ -110,3 +110,14 @@ func (s *ForumService) AddComment(inputComment *models.InputForumComment, postCo
 
 	return nil
 }
+
+func (s *ForumService) RemovePost(postId primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	if err := s.repo.DeletePost(ctx, postId); err != nil {
+		return err
+	}
+	defer cancel()
+
+	return nil
+}

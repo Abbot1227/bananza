@@ -95,5 +95,13 @@ func (h *Handler) AddComment(c *gin.Context) {
 }
 
 func (h *Handler) RemovePost(c *gin.Context) {
+	post := c.Params.ByName("id")
+	postId, _ := primitive.ObjectIDFromHex(post[3:])
 
+	if err := h.services.Forum.RemovePost(postId); err != nil {
+		logrus.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "deleted successfully"})
 }

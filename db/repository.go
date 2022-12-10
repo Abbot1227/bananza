@@ -49,6 +49,7 @@ type Forum interface {
 	GetForumPosts(ctx context.Context) ([]models.ForumPost, error)
 	GetForumPost(ctx context.Context, postId primitive.ObjectID) (*models.ForumPost, error)
 	CreateComment(ctx context.Context, forumComment *models.ForumComment, postId primitive.ObjectID) error
+	DeletePost(ctx context.Context, postId primitive.ObjectID) error
 }
 
 type Repository struct {

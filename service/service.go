@@ -45,6 +45,7 @@ type Forum interface {
 	GetForumTitles() (*[]models.SendForumTitles, error)
 	GetForumPost(postId primitive.ObjectID) (*models.ForumPost, error)
 	AddComment(inputComment *models.InputForumComment, postComment *models.ForumComment, postId primitive.ObjectID) error
+	RemovePost(postId primitive.ObjectID) error
 }
 
 type Service struct {
