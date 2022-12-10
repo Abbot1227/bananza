@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type UserMongo struct {
@@ -121,14 +122,15 @@ func (r *UserMongo) SetLastLanguage(ctx context.Context, userId primitive.Object
 func (r *UserMongo) DeleteProfile(ctx context.Context, userId primitive.ObjectID) error {
 	progressFilter := bson.D{{"user", userId}}
 	userFilter := bson.D{{"_id", userId}}
+	opts := options.Delete().SetHint(bson.D{{"_id", 1}})
 
-	results, err := userProgressCollection.DeleteMany(ctx, progressFilter)
+	results, err := userProgressCollection.DeleteMany(ctx, progressFilter, opts)
 	if err != nil {
 		return err
 	}
 	logrus.Println(results)
 
-	result, err := usersCollection.DeleteOne(ctx, userFilter)
+	result, err := usersCollection.DeleteOne(ctx, userFilter, opts)
 	if err != nil {
 		return err
 	}

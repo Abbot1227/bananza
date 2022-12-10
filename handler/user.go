@@ -64,6 +64,11 @@ func (h *Handler) UserProgress(c *gin.Context) {
 
 	logrus.Println(user + " " + language)
 
+	if len(user) != 24 || (language != "German" && language != "Korean") || (language != "de" && language != "kr") {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "wrong id or language"})
+		return
+	}
+
 	progress, err := h.services.User.FindProgress(userId, language)
 	if err != nil {
 		logrus.Error(err.Error())
