@@ -12,7 +12,7 @@ import (
 )
 
 // TODO move variables to config file
-var username, password = getDBConfig()
+var username, password = "main", "admin"
 var connStr = "mongodb+srv://" + username + ":" + password + "@cluster0.9rrlh4n.mongodb.net/?retryWrites=true&w=majority"
 
 var Client = ConnectDB()
