@@ -11,6 +11,7 @@ var usersCollection = OpenCollection(Client, "users")
 var userProgressCollection = OpenCollection(Client, "userProgress")
 var deExercisesCollection = OpenCollection(Client, "deExercises")
 var krExercisesCollection = OpenCollection(Client, "krExercises")
+var postsCollection = OpenCollection(Client, "posts")
 
 type Authorization interface {
 	FindUser(ctx context.Context, ID string, user *models.User) error
@@ -43,6 +44,11 @@ type Exercise interface {
 }
 
 type Forum interface {
+	FindUser(ctx context.Context, userId primitive.ObjectID) (*models.User, error)
+	CreatePost(ctx context.Context, forumPost *models.ForumPost) error
+	GetForumPosts(ctx context.Context) ([]models.ForumPost, error)
+	GetForumPost(ctx context.Context, postId primitive.ObjectID) (*models.ForumPost, error)
+	CreateComment(ctx context.Context, forumComment *models.ForumComment, postId primitive.ObjectID) error
 }
 
 type Repository struct {
@@ -57,5 +63,6 @@ func NewRepository() *Repository {
 		Authorization: NewAuthMongo(),
 		User:          NewUserMongo(),
 		Exercise:      NewExerciseMongo(),
+		Forum:         NewForumMongo(),
 	}
 }

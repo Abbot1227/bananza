@@ -59,13 +59,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	forum := router.Group("/forum")
 	{
 		// C
-		forum.POST("/")
+		forum.POST("/post", h.CreatePost) // Done
 		// R
-		forum.GET("/", h.ForumArticles)
+		forum.GET("/", h.ForumTitles)       // Add pagination
+		forum.GET("/post/:id", h.ForumPost) // Done
 		// U
-		forum.PUT("/")
+		forum.PUT("/post/:id", h.AddComment) // Done
 		// D
-		forum.DELETE("/")
+		forum.DELETE("/post/:id", h.RemovePost) // Delete post
 	}
 
 	grammar := router.Group("/grammar")

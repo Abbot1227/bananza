@@ -117,7 +117,7 @@ func (h *Handler) SendAnswer(c *gin.Context) {
 	answer, err := h.services.Exercise.GetRightAnswer(inputAnswer.Answer)
 	if err != nil {
 		logrus.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 

@@ -41,6 +41,10 @@ type Exercise interface {
 }
 
 type Forum interface {
+	AddPost(inputForumPost *models.InputForumPost, forumPost *models.ForumPost) error
+	GetForumTitles() (*[]models.SendForumTitles, error)
+	GetForumPost(postId primitive.ObjectID) (*models.ForumPost, error)
+	AddComment(inputComment *models.InputForumComment, postComment *models.ForumComment, postId primitive.ObjectID) error
 }
 
 type Service struct {
@@ -51,8 +55,9 @@ type Service struct {
 }
 
 func NewService(repos *db.Repository) *Service {
-	return &Service{Authorization: NewAuthService(repos.Authorization),
-		User:     NewUserService(repos.User),
-		Exercise: NewExerciseService(repos.Exercise),
-	}
+	return &Service{
+		Authorization: NewAuthService(repos.Authorization),
+		User:          NewUserService(repos.User),
+		Exercise:      NewExerciseService(repos.Exercise),
+		Forum:         NewForumService(repos.Forum)}
 }
