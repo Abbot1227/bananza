@@ -4,7 +4,6 @@ import (
 	"Bananza/db"
 	"Bananza/models"
 	"context"
-	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/api/googleapi"
@@ -36,14 +35,12 @@ func (s *AuthService) AuthenticateUser(token models.AuthToken) (*models.User, er
 
 	if err = s.repo.FindUser(ctx, userId, &user); err != nil {
 		if err != mongo.ErrNoDocuments {
-			logrus.Error("nigger serv 1", err.Error())
 			return nil, err
 		}
 
 		// Getting user google account info from Google api
 		userInfo, err := getUserInfo(token.Token)
 		if err != nil {
-			logrus.Error("nigger serv 2", err.Error())
 			return nil, err
 		}
 
@@ -60,7 +57,6 @@ func (s *AuthService) AuthenticateUser(token models.AuthToken) (*models.User, er
 
 		// Inserting new user into database
 		if err = s.repo.CreateUser(ctx, &user); err != nil {
-			logrus.Error("nigger serv 3", err.Error())
 			return nil, err
 		}
 		return &user, nil

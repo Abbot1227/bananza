@@ -16,6 +16,7 @@ func (h *Handler) AuthenticateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	logrus.Println(token)
 
 	// Ensure that data we receive is correct
 	validationErr := validate.Struct(&token)

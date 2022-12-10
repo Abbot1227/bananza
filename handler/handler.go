@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"Bananza/middlewares"
 	"Bananza/service"
 	"net/http"
 
@@ -61,12 +62,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		// C
 		forum.POST("/post", h.CreatePost) // Done
 		// R
-		forum.GET("/", h.ForumTitles)       // Add pagination
-		forum.GET("/post/:id", h.ForumPost) // Done
+		forum.GET("/", h.ForumTitles)                                           // Add pagination
+		forum.GET("/post/:id", h.ForumPost).Use(middlewares.PostIdMiddleware()) // Done
 		// U
-		forum.PUT("/post/:id", h.AddComment) // Done
+		forum.PUT("/post/:id", h.AddComment).Use(middlewares.PostIdMiddleware()) // Done
 		// D
-		forum.DELETE("/post/:id", h.RemovePost) // Done
+		forum.DELETE("/post/:id", h.RemovePost).Use(middlewares.PostIdMiddleware()) // Done
 	}
 
 	grammar := router.Group("/grammar")

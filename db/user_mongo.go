@@ -73,7 +73,7 @@ func (r *UserMongo) FindProgresses(ctx context.Context, userId primitive.ObjectI
 	var languagesProgress []models.UserProgress
 	filter := bson.D{{"user", userId}}
 
-	cursor, err := usersCollection.Find(ctx, filter)
+	cursor, err := userProgressCollection.Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
