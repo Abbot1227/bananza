@@ -144,7 +144,7 @@ func (h *Handler) SendAnswer(c *gin.Context) {
 // @Summary
 func (h *Handler) LoadAudio(c *gin.Context) {
 	// The FormFile function takes in the POST input id file
-	c.Request.ParseMultipartForm(32 << 20)
+	c.Request.ParseMultipartForm(64 << 20)
 
 	languageParam := c.Params.ByName("lang")
 	language := languageParam[5:]
