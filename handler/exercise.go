@@ -159,6 +159,7 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 		return
 	}
 	defer file.Close()
+	logrus.Println(questionId, languageId, level)
 
 	// Get user answer in text format
 	userAnswer, err := h.services.Exercise.GetAudioAnswer(file, language)
