@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @title TODO App API
+// @title bananza
 // @version 1.0
 // description API server for todo application
 
