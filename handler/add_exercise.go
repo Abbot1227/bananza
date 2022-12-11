@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+// AddTextImageExercise godoc
+// @Summary
 func (h *Handler) AddTextImageExercise(c *gin.Context) {
 	languageParam := c.Params.ByName("lang")
 	language := languageParam[5:]
@@ -41,6 +43,8 @@ func (h *Handler) AddTextImageExercise(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "created"})
 }
 
+// AddImagesExercise godoc
+// @Summary
 func (h *Handler) AddImagesExercise(c *gin.Context) {
 	languageParam := c.Params.ByName("lang")
 	language := languageParam[5:]
@@ -75,6 +79,8 @@ func (h *Handler) AddImagesExercise(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "created"})
 }
 
+// AddAudioExercise godoc
+// @Summary
 func (h *Handler) AddAudioExercise(c *gin.Context) {
 	languageParam := c.Params.ByName("lang")
 	language := languageParam[5:]

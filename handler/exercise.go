@@ -11,6 +11,8 @@ import (
 
 var ExpMultiplier = 50
 
+// SendExercise godoc
+// @Summary
 func (h *Handler) SendExercise(c *gin.Context) {
 	var acquireExercise models.AcquireExercise
 
@@ -96,6 +98,8 @@ func (h *Handler) SendExercise(c *gin.Context) {
 	}
 }
 
+// SendAnswer godoc
+// @Summary
 func (h *Handler) SendAnswer(c *gin.Context) {
 	var inputAnswer models.InputAnswer
 
@@ -136,6 +140,8 @@ func (h *Handler) SendAnswer(c *gin.Context) {
 	}
 }
 
+// LoadAudio godoc
+// @Summary
 func (h *Handler) LoadAudio(c *gin.Context) {
 	// The FormFile function takes in the POST input id file
 	c.Request.ParseMultipartForm(32 << 20)
@@ -188,6 +194,8 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 	}
 }
 
+// SetMultiplier godoc
+// @Summary
 func (h *Handler) SetMultiplier(c *gin.Context) {
 	multiplier := c.Query("set")
 	newMultiplier, _ := strconv.Atoi(multiplier)

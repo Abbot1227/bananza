@@ -203,7 +203,7 @@ func (s *ExerciseService) GetAudioAnswer(file multipart.File, language string) (
 }
 
 func (s *ExerciseService) checkASRConnection() error {
-	req, err := http.NewRequest("GET", "http://localhost:4040/predict", nil)
+	req, err := http.NewRequest("GET", "https://da2e-112-214-193-195.jp.ngrok.io/", nil)
 	if err != nil {
 		return err
 	}
@@ -245,7 +245,7 @@ func (s *ExerciseService) sendPostRequest(file multipart.File, temp *map[string]
 	}
 	w.Close()
 
-	req, err := http.NewRequest("POST", "http://localhost:4040/predict", bytes.NewReader(b.Bytes()))
+	req, err := http.NewRequest("POST", "https://da2e-112-214-193-195.jp.ngrok.io/predict", bytes.NewReader(b.Bytes()))
 	if err != nil {
 		return err
 	}
