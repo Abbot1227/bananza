@@ -149,9 +149,12 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 	languageParam := c.Params.ByName("lang")
 	language := languageParam[5:]
 
-	questionId := c.Request.MultipartForm.Value["id"]
-	languageId := c.Request.MultipartForm.Value["languageId"]
-	level := c.Request.MultipartForm.Value["level"]
+	//questionId := c.Request.MultipartForm.Value["id"]
+	//languageId := c.Request.MultipartForm.Value["languageId"]
+	//level := c.Request.MultipartForm.Value["level"]
+	questionId := c.Request.FormValue("id")
+	languageId := c.Request.FormValue("languageId")
+	level := c.Request.FormValue("level")
 	file, _, err := c.Request.FormFile("mp3")
 	if err != nil {
 		logrus.Error(err.Error())
@@ -159,7 +162,7 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 		return
 	}
 	defer file.Close()
-	logrus.Println(questionId, languageId, level)
+	logrus.Println(questionId, languageId, level, language)
 
 	// Get user answer in text format
 	userAnswer, err := h.services.Exercise.GetAudioAnswer(file, language)
@@ -170,7 +173,7 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 	}
 
 	// Get right answer for user question
-	rightAnswer, err := h.services.Exercise.GetRightAnswer(questionId[0])
+	rightAnswer, err := h.services.Exercise.GetRightAnswer(questionId)
 	if err != nil {
 		logrus.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -179,7 +182,7 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 
 	logrus.Println(userAnswer, " ", rightAnswer)
 
-	exp, _ := strconv.Atoi(level[0])
+	exp, _ := strconv.Atoi(level)
 	expToAdd := calculateGainExp(exp)
 
 	if userAnswer == rightAnswer {
@@ -189,7 +192,7 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.Exercise.UpdateProgress(languageId[0], expToAdd); err != nil {
+	if err := h.services.Exercise.UpdateProgress(languageId, expToAdd); err != nil {
 		logrus.Error(err.Error())
 		logrus.Println("could not update user's progress")
 	}
