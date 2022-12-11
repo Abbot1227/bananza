@@ -149,12 +149,9 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 	languageParam := c.Params.ByName("lang")
 	language := languageParam[5:]
 
-	//questionId := c.Request.MultipartForm.Value["id"]
-	//languageId := c.Request.MultipartForm.Value["languageId"]
-	//level := c.Request.MultipartForm.Value["level"]
-	questionId := c.Request.FormValue("id")
-	languageId := c.Request.FormValue("languageId")
-	level := c.Request.FormValue("level")
+	questionId := c.Request.MultipartForm.Value["id"]
+	languageId := c.Request.MultipartForm.Value["languageId"]
+	level := c.Request.MultipartForm.Value["level"]
 	file, _, err := c.Request.FormFile("mp3")
 	if err != nil {
 		logrus.Error(err.Error())
@@ -162,7 +159,7 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 		return
 	}
 	defer file.Close()
-	logrus.Println(questionId, languageId, level, language)
+	logrus.Println(questionId, languageId, level)
 
 	// Get user answer in text format
 	userAnswer, err := h.services.Exercise.GetAudioAnswer(file, language)
@@ -173,7 +170,7 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 	}
 
 	// Get right answer for user question
-	rightAnswer, err := h.services.Exercise.GetRightAnswer(questionId)
+	rightAnswer, err := h.services.Exercise.GetRightAnswer(questionId[0])
 	if err != nil {
 		logrus.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -182,17 +179,17 @@ func (h *Handler) LoadAudio(c *gin.Context) {
 
 	logrus.Println(userAnswer, " ", rightAnswer)
 
-	exp, _ := strconv.Atoi(level)
+	exp, _ := strconv.Atoi(level[0])
 	expToAdd := calculateGainExp(exp)
 
 	if userAnswer == rightAnswer {
-		c.JSON(http.StatusOK, gin.H{"correct": "true", "answer": rightAnswer, "exp": expToAdd})
+		c.JSON(http.StatusOK, gin.H{"correct": "true", "answer": rightAnswer, "exp": expToAdd, "userAnswer": userAnswer})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": rightAnswer, "exp": 0})
+		c.JSON(http.StatusOK, gin.H{"correct": "false", "answer": rightAnswer, "exp": 0, "userAnswer": userAnswer})
 		return
 	}
 
-	if err := h.services.Exercise.UpdateProgress(languageId, expToAdd); err != nil {
+	if err := h.services.Exercise.UpdateProgress(languageId[0], expToAdd); err != nil {
 		logrus.Error(err.Error())
 		logrus.Println("could not update user's progress")
 	}
