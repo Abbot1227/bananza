@@ -18,12 +18,12 @@ import (
 
 type ExerciseService struct {
 	repo   db.Exercise
-	client *http.Client
+	client http.Client
 }
 
 func NewExerciseService(repo db.Exercise) *ExerciseService {
 	return &ExerciseService{repo: repo,
-		client: new(http.Client)}
+		client: http.Client{}}
 }
 
 func (s *ExerciseService) GetExerciseType() (int, error) {
@@ -208,7 +208,10 @@ func (s *ExerciseService) checkASRConnection() error {
 		return err
 	}
 
-	res, _ := s.client.Do(req)
+	res, err := s.client.Do(req)
+	if err != nil {
+		return err
+	}
 	if res.StatusCode != http.StatusOK {
 		err = fmt.Errorf("bad status: %s", res.Status)
 		return err
@@ -248,7 +251,10 @@ func (s *ExerciseService) sendPostRequest(file multipart.File, temp *map[string]
 	}
 	req.Header.Set("Content-Type", w.FormDataContentType())
 
-	res, _ := s.client.Do(req)
+	res, err := s.client.Do(req)
+	if err != nil {
+		return err
+	}
 	if res.StatusCode != http.StatusOK {
 		err = fmt.Errorf("bad status: %s", res.Status)
 		return err
