@@ -144,9 +144,12 @@ func (r *ExerciseMongo) GetRightAnswer(ctx context.Context, questionId string) (
 	opts := options.FindOne().SetProjection(bson.D{{"_id", 0}, {"answer", 1}})
 
 	if err := deExercisesCollection.FindOne(ctx, filter, opts).Decode(&answerStruct); err != nil {
-		if err = krExercisesCollection.FindOne(ctx, filter, opts).Decode(&answerStruct); err != nil {
-			return "", err
+		if err == mongo.ErrNoDocuments {
+			if err = krExercisesCollection.FindOne(ctx, filter, opts).Decode(&answerStruct); err != nil {
+				return "", err
+			}
 		}
+		return nil, err
 	}
 	answer := answerStruct.Map()
 
