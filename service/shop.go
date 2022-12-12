@@ -26,6 +26,12 @@ func (s *ShopService) BuyAvatar(inputAvatarPurchase *models.InputAvatarPurchase)
 	}
 	defer cancel()
 
+	for _, avatar := range user.Avatars {
+		if inputAvatarPurchase.AvatarUrl == avatar {
+			return errors.New("user already has this avatar")
+		}
+	}
+
 	// Checking if user has sufficient amount of money to pay for avatar
 	if user.Balance < inputAvatarPurchase.Price {
 		return errors.New("insufficient balance")

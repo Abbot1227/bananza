@@ -74,11 +74,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	shop := router.Group("/shop")
 	{
 		// C
-		shop.POST("/buy", h.BuyAvatar)
+		shop.POST("/buy", h.BuyAvatar) // Done
 		// R
 		shop.GET("/", h.Avatars) // Done
 		// U
-		shop.PUT("/set", h.SetAvatar)
+		shop.PUT("/set", h.SetAvatar) // Done
 	}
 
 	grammar := router.Group("/grammar")
