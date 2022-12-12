@@ -52,7 +52,7 @@ func (r *ShopMongo) AddAvatarToUser(ctx context.Context, userId string, avatarUr
 
 func (r *ShopMongo) SetUserAvatar(ctx context.Context, userId string, avatarUrl string) error {
 	id, _ := primitive.ObjectIDFromHex(userId)
-	update := bson.D{{"$set", bson.D{{"avatar", avatarUrl}}}}
+	update := bson.D{{"$set", bson.D{{"avatarurl", avatarUrl}}}}
 
 	result, err := usersCollection.UpdateByID(ctx, id, update)
 	if err != nil {
