@@ -123,18 +123,19 @@ func (r *UserMongo) DeleteProfile(ctx context.Context, userId primitive.ObjectID
 	progressFilter := bson.D{{"user", userId}}
 	userFilter := bson.D{{"_id", userId}}
 	opts := options.Delete().SetHint(bson.D{{"_id", 1}}) // TODO Here
+	logrus.Println(userId)
 
 	results, err := userProgressCollection.DeleteMany(ctx, progressFilter, opts)
 	if err != nil {
 		return err
 	}
-	logrus.Println(results)
+	logrus.Println(results.DeletedCount)
 
 	result, err := usersCollection.DeleteOne(ctx, userFilter, opts)
 	if err != nil {
 		return err
 	}
-	logrus.Println(result)
+	logrus.Println(result.DeletedCount)
 
 	return nil
 }

@@ -41,7 +41,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		user.PUT("/progress", h.UpdateProgress)  // Done Test add middlewares check if exists
 		user.PUT("/lastlang", h.SetLastLanguage) // Done
 		// D
-		user.DELETE("/:id", h.RemoveUser) // Done
+		user.DELETE("/", h.RemoveUser) // Done
 	}
 
 	exercise := router.Group("/exercises")
