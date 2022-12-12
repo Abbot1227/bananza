@@ -12,6 +12,7 @@ var userProgressCollection = OpenCollection(Client, "userProgress")
 var deExercisesCollection = OpenCollection(Client, "deExercises")
 var krExercisesCollection = OpenCollection(Client, "krExercises")
 var postsCollection = OpenCollection(Client, "posts")
+var avatarsCollection = OpenCollection(Client, "avatars")
 
 type Authorization interface {
 	FindUser(ctx context.Context, ID string, user *models.User) error
@@ -52,11 +53,20 @@ type Forum interface {
 	DeletePost(ctx context.Context, postId primitive.ObjectID) error
 }
 
+type Shop interface {
+	GetUser(ctx context.Context, userId string) (models.User, error)
+	UpdateUserBalance(ctx context.Context, user *models.User) error
+	AddAvatarToUser(ctx context.Context, userId string, avatarUrl string) error
+	SetUserAvatar(ctx context.Context, userId string, avatarUrl string) error
+	GetAvatars(ctx context.Context) ([]models.Avatar, error)
+}
+
 type Repository struct {
 	Authorization
 	User
 	Exercise
 	Forum
+	Shop
 }
 
 func NewRepository() *Repository {
@@ -65,5 +75,6 @@ func NewRepository() *Repository {
 		User:          NewUserMongo(),
 		Exercise:      NewExerciseMongo(),
 		Forum:         NewForumMongo(),
+		Shop:          NewShopMongo(),
 	}
 }

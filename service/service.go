@@ -48,11 +48,18 @@ type Forum interface {
 	RemovePost(postId primitive.ObjectID) error
 }
 
+type Shop interface {
+	BuyAvatar(inputAvatarPurchase *models.InputAvatarPurchase) error
+	GetAvatars() (*[]models.Avatar, error)
+	SetAvatar(inputAvatarSet *models.InputAvatarSet) error
+}
+
 type Service struct {
 	Authorization
 	User
 	Exercise
 	Forum
+	Shop
 }
 
 func NewService(repos *db.Repository) *Service {
@@ -60,5 +67,7 @@ func NewService(repos *db.Repository) *Service {
 		Authorization: NewAuthService(repos.Authorization),
 		User:          NewUserService(repos.User),
 		Exercise:      NewExerciseService(repos.Exercise),
-		Forum:         NewForumService(repos.Forum)}
+		Forum:         NewForumService(repos.Forum),
+		Shop:          NewShopService(repos.Shop),
+	}
 }

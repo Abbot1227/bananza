@@ -70,9 +70,21 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		forum.DELETE("/post/:id", h.RemovePost).Use(middlewares.PostIdMiddleware()) // Done
 	}
 
+	shop := router.Group("/shop")
+	{
+		// C
+		shop.POST("/buy", h.BuyAvatar)
+		// R
+		shop.GET("/", h.Avatars) // Done
+		// U
+		shop.PUT("/set", h.SetAvatar)
+	}
+
 	grammar := router.Group("/grammar")
 	{
+		// R
 		grammar.GET("/")
+		grammar.GET("/dictionary")
 	}
 
 	return router

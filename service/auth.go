@@ -54,6 +54,9 @@ func (s *AuthService) AuthenticateUser(token models.AuthToken) (*models.User, er
 		user.AvatarURL = userInfo.Picture
 		user.LastLanguage = ""
 		user.Balance = 0
+		user.Avatars = []string{}
+
+		user.Avatars = append(user.Avatars, user.AvatarURL)
 
 		// Inserting new user into database
 		if err = s.repo.CreateUser(ctx, &user); err != nil {

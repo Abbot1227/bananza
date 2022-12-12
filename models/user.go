@@ -14,6 +14,7 @@ type User struct {
 	AvatarURL    string             `json:"avatar_url"`
 	LastLanguage string             `json:"last_language"`
 	Balance      int                `json:"balance"`
+	Avatars      []string           `json:"avatars"`
 }
 
 type UserProgress struct {
