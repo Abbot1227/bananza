@@ -18,7 +18,7 @@ func NewExerciseMongo() *ExerciseMongo {
 }
 
 func (r *ExerciseMongo) GetEnLnExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.TextExercise) error {
-	matchTypeStage := bson.D{{"$match", bson.D{{"type", 1}}}}
+	matchTypeStage := bson.D{{"$match", bson.D{{"type", 0}}}}
 	matchLevelStage := bson.D{{"$match", bson.D{{"level", exerciseDesc.Exp}}}}
 	randomStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
 
@@ -42,7 +42,7 @@ func (r *ExerciseMongo) GetEnLnExercise(ctx context.Context, exerciseDesc models
 }
 
 func (r *ExerciseMongo) GetLnEnExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.TextExercise) error {
-	matchTypeStage := bson.D{{"$match", bson.D{{"type", 2}}}}
+	matchTypeStage := bson.D{{"$match", bson.D{{"type", 1}}}}
 	matchLevelStage := bson.D{{"$match", bson.D{{"level", exerciseDesc.Exp}}}}
 	randomStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
 
