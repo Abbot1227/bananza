@@ -55,7 +55,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		exercise.POST("add/audio/:lang", h.AddAudioExercise)      // Done
 		// R
 		exercise.GET("/mul", h.SetMultiplier) // Done
-		//exercise.GET("/all/:lang", h.GetExercises)
+		exercise.GET("/asr", h.SetASRUrl)     // Done
 	}
 
 	forum := router.Group("/forum")

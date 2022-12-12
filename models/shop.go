@@ -15,7 +15,7 @@ type Avatar struct {
 type InputAvatarPurchase struct {
 	UserId    string `json:"user_id"`
 	AvatarUrl string `json:"avatar_url"`
-	Price     string `json:"price"`
+	Price     int    `json:"price"`
 }
 
 type InputAvatarSet struct {

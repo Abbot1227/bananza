@@ -5,7 +5,6 @@ import (
 	"Bananza/models"
 	"context"
 	"errors"
-	"strconv"
 	"time"
 )
 
@@ -27,13 +26,11 @@ func (s *ShopService) BuyAvatar(inputAvatarPurchase *models.InputAvatarPurchase)
 	}
 	defer cancel()
 
-	avatarPrice, _ := strconv.Atoi(inputAvatarPurchase.Price)
-
 	// Checking if user has sufficient amount of money to pay for avatar
-	if user.Balance < avatarPrice {
+	if user.Balance < inputAvatarPurchase.Price {
 		return errors.New("insufficient balance")
 	} else {
-		user.Balance -= avatarPrice
+		user.Balance -= inputAvatarPurchase.Price
 	}
 
 	// Subtracting price of avatar from user's balance
