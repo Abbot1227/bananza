@@ -54,12 +54,16 @@ type Shop interface {
 	SetAvatar(inputAvatarSet *models.InputAvatarSet) error
 }
 
+type Grammar interface {
+}
+
 type Service struct {
 	Authorization
 	User
 	Exercise
 	Forum
 	Shop
+	Grammar
 }
 
 func NewService(repos *db.Repository) *Service {
@@ -69,5 +73,6 @@ func NewService(repos *db.Repository) *Service {
 		Exercise:      NewExerciseService(repos.Exercise),
 		Forum:         NewForumService(repos.Forum),
 		Shop:          NewShopService(repos.Shop),
+		Grammar:       NewGrammarService(repos.Grammar),
 	}
 }

@@ -61,12 +61,16 @@ type Shop interface {
 	GetAvatars(ctx context.Context) ([]models.Avatar, error)
 }
 
+type Grammar interface {
+}
+
 type Repository struct {
 	Authorization
 	User
 	Exercise
 	Forum
 	Shop
+	Grammar
 }
 
 func NewRepository() *Repository {
@@ -76,5 +80,6 @@ func NewRepository() *Repository {
 		Exercise:      NewExerciseMongo(),
 		Forum:         NewForumMongo(),
 		Shop:          NewShopMongo(),
+		Grammar:       NewGrammarMongo(),
 	}
 }

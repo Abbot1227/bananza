@@ -125,6 +125,7 @@ func (h *Handler) SendAnswer(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	logrus.Println("Right answer: ", answer)
 
 	expToAdd := calculateGainExp(inputAnswer.Level)
 

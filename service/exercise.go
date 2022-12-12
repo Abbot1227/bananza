@@ -30,7 +30,8 @@ func NewExerciseService(repo db.Exercise) *ExerciseService {
 
 func (s *ExerciseService) GetExerciseType() (int, error) {
 	if err := s.checkASRConnection(); err != nil {
-		return 0, nil
+		exerciseType := s.generateRandomType(4)
+		return exerciseType, nil
 	}
 
 	exerciseType := s.generateRandomType(4)
