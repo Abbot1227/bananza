@@ -42,7 +42,7 @@ type Exercise interface {
 
 type Forum interface {
 	AddPost(inputForumPost *models.InputForumPost, forumPost *models.ForumPost) error
-	GetForumTitles() (*[]models.SendForumTitles, error)
+	GetForumTitles(skip int) (*[]models.SendForumTitles, error)
 	GetForumPost(postId primitive.ObjectID) (*models.ForumPost, error)
 	AddComment(inputComment *models.InputForumComment, postComment *models.ForumComment, postId primitive.ObjectID) error
 	RemovePost(postId primitive.ObjectID) error

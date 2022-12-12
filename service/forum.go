@@ -48,12 +48,12 @@ func (s *ForumService) AddPost(inputForumPost *models.InputForumPost, forumPost 
 	return nil
 }
 
-func (s *ForumService) GetForumTitles() (*[]models.SendForumTitles, error) {
+func (s *ForumService) GetForumTitles(skip int) (*[]models.SendForumTitles, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
 	var forumTitles []models.SendForumTitles
 
-	forumPosts, err := s.repo.GetForumPosts(ctx)
+	forumPosts, err := s.repo.GetForumPosts(ctx, skip)
 	if err != nil {
 		return nil, err
 	}

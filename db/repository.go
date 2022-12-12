@@ -47,7 +47,7 @@ type Exercise interface {
 type Forum interface {
 	FindUser(ctx context.Context, userId primitive.ObjectID) (*models.User, error)
 	CreatePost(ctx context.Context, forumPost *models.ForumPost) error
-	GetForumPosts(ctx context.Context) ([]models.ForumPost, error)
+	GetForumPosts(ctx context.Context, skip int) ([]models.ForumPost, error)
 	GetForumPost(ctx context.Context, postId primitive.ObjectID) (*models.ForumPost, error)
 	CreateComment(ctx context.Context, forumComment *models.ForumComment, postId primitive.ObjectID) error
 	DeletePost(ctx context.Context, postId primitive.ObjectID) error

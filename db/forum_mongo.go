@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ForumMongo struct {
@@ -35,10 +36,11 @@ func (r *ForumMongo) CreatePost(ctx context.Context, forumPost *models.ForumPost
 	return nil
 }
 
-func (r *ForumMongo) GetForumPosts(ctx context.Context) ([]models.ForumPost, error) {
+func (r *ForumMongo) GetForumPosts(ctx context.Context, skip int) ([]models.ForumPost, error) {
 	var forumPosts []models.ForumPost
+	opts := options.Find().SetSkip(10 * int64(skip)).SetLimit(10)
 
-	cursor, err := postsCollection.Find(ctx, bson.M{})
+	cursor, err := postsCollection.Find(ctx, bson.M{}, opts)
 	if err != nil {
 		return nil, err
 	}

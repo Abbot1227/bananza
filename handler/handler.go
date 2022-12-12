@@ -63,7 +63,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		// C
 		forum.POST("/post", h.CreatePost) // Done
 		// R
-		forum.GET("/", h.ForumTitles)                                           // Add pagination
+		forum.GET("/:skip", h.ForumTitles)                                      // Done
 		forum.GET("/post/:id", h.ForumPost).Use(middlewares.PostIdMiddleware()) // Done
 		// U
 		forum.PUT("/post/:id", h.AddComment).Use(middlewares.PostIdMiddleware()) // Done

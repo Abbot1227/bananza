@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
+	"strconv"
 )
 
 func (h *Handler) CreatePost(c *gin.Context) {
@@ -38,7 +39,10 @@ func (h *Handler) CreatePost(c *gin.Context) {
 }
 
 func (h *Handler) ForumTitles(c *gin.Context) {
-	forumTitles, err := h.services.Forum.GetForumTitles()
+	skipNum := c.Params.ByName("skip")
+	skip, _ := strconv.Atoi(skipNum[5:])
+
+	forumTitles, err := h.services.Forum.GetForumTitles(skip)
 	if err != nil {
 		logrus.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
