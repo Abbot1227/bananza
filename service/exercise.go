@@ -16,7 +16,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var ASRUrl = "https://bananzas.live/asr?set=https://f1ae-112-214-193-195.jp.ngrok.io"
+//var ASRUrl = "https://bananzas.live/asr?set=https://f1ae-112-214-193-195.jp.ngrok.io"
 
 type ExerciseService struct {
 	repo   db.Exercise
@@ -206,7 +206,7 @@ func (s *ExerciseService) GetAudioAnswer(file multipart.File, language string) (
 }
 
 func (s *ExerciseService) checkASRConnection() error {
-	req, err := http.NewRequest("GET", ASRUrl+"/", nil)
+	req, err := http.NewRequest("GET", "https://f1ae-112-214-193-195.jp.ngrok.io/", nil)
 	if err != nil {
 		return err
 	}
@@ -248,7 +248,7 @@ func (s *ExerciseService) sendPostRequest(file multipart.File, temp *map[string]
 	}
 	w.Close()
 
-	req, err := http.NewRequest("POST", ASRUrl+"/predict", bytes.NewReader(b.Bytes()))
+	req, err := http.NewRequest("POST", "https://f1ae-112-214-193-195.jp.ngrok.io/predict", bytes.NewReader(b.Bytes()))
 	if err != nil {
 		return err
 	}
