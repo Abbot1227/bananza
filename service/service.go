@@ -55,6 +55,7 @@ type Shop interface {
 }
 
 type Grammar interface {
+	GetGrammar(inputGrammar models.InputDictionary) (*[]models.Grammar, error)
 	GetDictionary(inputDictionary models.InputDictionary) (*[]models.Dictionary, error)
 }
 

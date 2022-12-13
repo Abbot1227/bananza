@@ -12,6 +12,13 @@ type Dictionary struct {
 	Language string             `json:"language" bson:"language"` // "German" or "Korean"
 }
 
+type Grammar struct {
+	ID    primitive.ObjectID `json:"-" bson:"_id"`
+	Title string             `json:"title" bson:"title"`
+	Text  string             `json:"text" bson:"text"`
+	Level int                `json:"level" bson:"level"`
+}
+
 // Forms
 
 type InputDictionary struct {

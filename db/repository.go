@@ -14,6 +14,7 @@ var krExercisesCollection = OpenCollection(Client, "krExercises")
 var postsCollection = OpenCollection(Client, "posts")
 var avatarsCollection = OpenCollection(Client, "avatars")
 var dictionaryCollection = OpenCollection(Client, "dictionary")
+var grammarCollection = OpenCollection(Client, "grammar")
 
 type Authorization interface {
 	FindUser(ctx context.Context, ID string, user *models.User) error
@@ -63,6 +64,7 @@ type Shop interface {
 }
 
 type Grammar interface {
+	GetGrammar(ctx context.Context, inputGrammar models.InputDictionary) (*[]models.Grammar, error)
 	GetDictionary(ctx context.Context, inputDictionary models.InputDictionary) (*[]models.Dictionary, error)
 }
 

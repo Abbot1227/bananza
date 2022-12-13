@@ -84,7 +84,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	grammar := router.Group("/grammar")
 	{
 		// R
-		grammar.GET("/")
+		grammar.POST("/", h.Grammar)
 		grammar.POST("/dictionary", h.Dictionary) // Done
 	}
 
