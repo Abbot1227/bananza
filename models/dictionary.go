@@ -13,10 +13,11 @@ type Dictionary struct {
 }
 
 type Grammar struct {
-	ID    primitive.ObjectID `json:"-" bson:"_id"`
-	Title string             `json:"title" bson:"title"`
-	Text  string             `json:"text" bson:"text"`
-	Level int                `json:"level" bson:"level"`
+	ID       primitive.ObjectID `json:"-" bson:"_id"`
+	Title    string             `json:"title" bson:"title"`
+	Text     string             `json:"text" bson:"text"`
+	Level    int                `json:"level" bson:"level"`
+	Language string             `json:"language" bson:"language"` // "German" or "Korean"
 }
 
 // Forms
