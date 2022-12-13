@@ -163,7 +163,7 @@ func (r *ExerciseMongo) IncrementProgressLevel(ctx context.Context, languageId s
 	id, _ := primitive.ObjectIDFromHex(languageId)
 
 	result, err := userProgressCollection.UpdateByID(ctx, id, bson.D{
-		{"$inc", bson.D{{"level", expToAdd}}},
+		{"$inc", bson.D{{"level", int32(expToAdd)}}},
 	})
 	if err != nil {
 		return err
