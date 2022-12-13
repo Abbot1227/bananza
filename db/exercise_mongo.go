@@ -170,7 +170,13 @@ func (r *ExerciseMongo) IncrementProgressLevel(ctx context.Context, languageId s
 	}
 	logrus.Println(result)
 
-	result, err = usersCollection.UpdateByID(ctx, id, bson.D{
+	var userProgress models.UserProgress
+
+	if err := userProgressCollection.FindOne(ctx, bson.D{{"_id", id}}).Decode(&userProgress); err != nil {
+		return err
+	}
+
+	result, err = usersCollection.UpdateByID(ctx, userProgress.User, bson.D{
 		{"$inc", bson.D{{"balance", 10}}},
 	})
 	if err != nil {
