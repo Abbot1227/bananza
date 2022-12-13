@@ -219,7 +219,7 @@ func (h *Handler) SetASRUrl(c *gin.Context) {
 // calculateGainExp returns number of experience
 // gained by user after solving question
 func calculateGainExp(level int) float64 {
-	if level/100 == 0 {
+	if level/100 == 0 || level/100 == 1 {
 		return 5
 	}
 	return (100 / float64(level)) * float64(ExpMultiplier)

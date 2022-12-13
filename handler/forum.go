@@ -50,6 +50,11 @@ func (h *Handler) ForumTitles(c *gin.Context) {
 	}
 	logrus.Println(forumTitles)
 
+	if forumTitles == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "no more posts"})
+		return
+	}
+
 	c.JSON(http.StatusOK, forumTitles)
 }
 

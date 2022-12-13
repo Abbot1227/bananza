@@ -19,7 +19,7 @@ func NewExerciseMongo() *ExerciseMongo {
 
 func (r *ExerciseMongo) GetEnLnExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.TextExercise) error {
 	matchTypeStage := bson.D{{"$match", bson.D{{"type", 0}}}}
-	matchLevelStage := bson.D{{"$match", bson.D{{"level", exerciseDesc.Exp}}}}
+	matchLevelStage := bson.D{{"$match", bson.D{{"level", bson.D{{"$lte", exerciseDesc.Exp}}}}}}
 	randomStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
 
 	var languageCollection *mongo.Collection
@@ -43,7 +43,7 @@ func (r *ExerciseMongo) GetEnLnExercise(ctx context.Context, exerciseDesc models
 
 func (r *ExerciseMongo) GetLnEnExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.TextExercise) error {
 	matchTypeStage := bson.D{{"$match", bson.D{{"type", 1}}}}
-	matchLevelStage := bson.D{{"$match", bson.D{{"level", exerciseDesc.Exp}}}}
+	matchLevelStage := bson.D{{"$match", bson.D{{"level", bson.D{{"$lte", exerciseDesc.Exp}}}}}}
 	randomStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
 
 	var languageCollection *mongo.Collection
@@ -67,7 +67,7 @@ func (r *ExerciseMongo) GetLnEnExercise(ctx context.Context, exerciseDesc models
 
 func (r *ExerciseMongo) GetImageExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.ImageExercise) error {
 	matchTypeStage := bson.D{{"$match", bson.D{{"type", 2}}}}
-	matchLevelStage := bson.D{{"$match", bson.D{{"level", exerciseDesc.Exp}}}}
+	matchLevelStage := bson.D{{"$match", bson.D{{"level", bson.D{{"$lte", exerciseDesc.Exp}}}}}}
 	randomStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
 
 	var languageCollection *mongo.Collection
@@ -91,7 +91,7 @@ func (r *ExerciseMongo) GetImageExercise(ctx context.Context, exerciseDesc model
 
 func (r *ExerciseMongo) GetImagesExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.ImagesExercise) error {
 	matchTypeStage := bson.D{{"$match", bson.D{{"type", 3}}}}
-	matchLevelStage := bson.D{{"$match", bson.D{{"level", exerciseDesc.Exp}}}}
+	matchLevelStage := bson.D{{"$match", bson.D{{"level", bson.D{{"$lte", exerciseDesc.Exp}}}}}}
 	randomStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
 
 	var languageCollection *mongo.Collection
@@ -115,7 +115,7 @@ func (r *ExerciseMongo) GetImagesExercise(ctx context.Context, exerciseDesc mode
 
 func (r *ExerciseMongo) GetAudioExercise(ctx context.Context, exerciseDesc models.AcquireExercise, exercise *[]models.AudioExercise) error {
 	matchTypeStage := bson.D{{"$match", bson.D{{"type", 4}}}}
-	matchLevelStage := bson.D{{"$match", bson.D{{"level", exerciseDesc.Exp}}}}
+	matchLevelStage := bson.D{{"$match", bson.D{{"level", bson.D{{"$lte", exerciseDesc.Exp}}}}}}
 	randomStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
 
 	var languageCollection *mongo.Collection
@@ -144,12 +144,15 @@ func (r *ExerciseMongo) GetRightAnswer(ctx context.Context, questionId string) (
 	opts := options.FindOne().SetProjection(bson.D{{"_id", 0}, {"answer", 1}})
 
 	if err := deExercisesCollection.FindOne(ctx, filter, opts).Decode(&answerStruct); err != nil {
-		//if err == mongo.ErrNoDocuments {
-		//	if err = krExercisesCollection.FindOne(ctx, filter, opts).Decode(&answerStruct); err != nil {
-		//		return "", err
-		//	}
-		//}
-		return nil, err
+		if err == mongo.ErrNoDocuments {
+			if err = krExercisesCollection.FindOne(ctx, filter, opts).Decode(&answerStruct); err != nil {
+				return "", err
+			}
+			answer := answerStruct.Map()
+
+			return answer["answer"], nil
+		}
+		return "", err
 	}
 	answer := answerStruct.Map()
 
