@@ -4,6 +4,7 @@ import (
 	"Bananza/models"
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type GrammarMongo struct{}
@@ -14,16 +15,10 @@ func NewGrammarMongo() *GrammarMongo {
 
 func (r *GrammarMongo) GetGrammar(ctx context.Context, inputGrammar models.InputDictionary) (*[]models.Grammar, error) {
 	var grammar []models.Grammar
-	filter := bson.D{
-		{"$and",
-			bson.A{
-				bson.D{{"level", inputGrammar.Level}},
-				bson.D{{"language", inputGrammar.Language}},
-			},
-		},
-	}
+	matchLanguageStage := bson.D{{"$match", bson.D{{"language", inputGrammar.Language}}}}
+	matchLevelStage := bson.D{{"$match", bson.D{{"level", bson.D{{"$lte", inputGrammar.Level}}}}}}
 
-	cursor, err := grammarCollection.Find(ctx, filter)
+	cursor, err := grammarCollection.Find(ctx, mongo.Pipeline{matchLanguageStage, matchLevelStage})
 	if err != nil {
 		return nil, err
 	}
@@ -36,16 +31,10 @@ func (r *GrammarMongo) GetGrammar(ctx context.Context, inputGrammar models.Input
 
 func (r *GrammarMongo) GetDictionary(ctx context.Context, inputDictionary models.InputDictionary) (*[]models.Dictionary, error) {
 	var dictionary []models.Dictionary
-	filter := bson.D{
-		{"$and",
-			bson.A{
-				bson.D{{"level", inputDictionary.Level}},
-				bson.D{{"language", inputDictionary.Language}},
-			},
-		},
-	}
+	matchLanguageStage := bson.D{{"$match", bson.D{{"language", inputDictionary.Language}}}}
+	matchLevelStage := bson.D{{"$match", bson.D{{"level", bson.D{{"$lte", inputDictionary.Level}}}}}}
 
-	cursor, err := dictionaryCollection.Find(ctx, filter)
+	cursor, err := dictionaryCollection.Find(ctx, mongo.Pipeline{matchLanguageStage, matchLevelStage})
 	if err != nil {
 		return nil, err
 	}
