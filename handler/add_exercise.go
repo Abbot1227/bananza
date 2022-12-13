@@ -51,6 +51,7 @@ func (h *Handler) AddImagesExercise(c *gin.Context) {
 
 	if language != "de" && language != "kr" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "wrong language"})
+		return
 	}
 
 	var exercise models.ImagesExercise
@@ -85,8 +86,9 @@ func (h *Handler) AddAudioExercise(c *gin.Context) {
 	languageParam := c.Params.ByName("lang")
 	language := languageParam[5:]
 
-	if language != "de" || language != "kr" {
+	if language != "de" && language != "kr" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "wrong language"})
+		return
 	}
 
 	var exercise models.AudioExercise

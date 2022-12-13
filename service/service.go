@@ -55,6 +55,7 @@ type Shop interface {
 }
 
 type Grammar interface {
+	GetDictionary(inputDictionary models.InputDictionary) (*[]models.Dictionary, error)
 }
 
 type Service struct {

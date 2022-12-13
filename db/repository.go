@@ -13,6 +13,7 @@ var deExercisesCollection = OpenCollection(Client, "deExercises")
 var krExercisesCollection = OpenCollection(Client, "krExercises")
 var postsCollection = OpenCollection(Client, "posts")
 var avatarsCollection = OpenCollection(Client, "avatars")
+var dictionaryCollection = OpenCollection(Client, "dictionary")
 
 type Authorization interface {
 	FindUser(ctx context.Context, ID string, user *models.User) error
@@ -62,6 +63,7 @@ type Shop interface {
 }
 
 type Grammar interface {
+	GetDictionary(ctx context.Context, inputDictionary models.InputDictionary) (*[]models.Dictionary, error)
 }
 
 type Repository struct {
