@@ -25,6 +25,8 @@ func (h *Handler) Grammar(c *gin.Context) {
 		return
 	}
 
+	inputGrammar.Level = inputGrammar.Level / 100
+
 	grammar, err := h.services.Grammar.GetGrammar(inputGrammar)
 	if err != nil {
 		logrus.Error(err.Error())
@@ -53,6 +55,8 @@ func (h *Handler) Dictionary(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
 		return
 	}
+
+	inputDictionary.Level = inputDictionary.Level / 100
 
 	dictionary, err := h.services.Grammar.GetDictionary(inputDictionary)
 	if err != nil {
