@@ -2,7 +2,6 @@ package handler
 
 import (
 	"Bananza/models"
-	"Bananza/service"
 	"net/http"
 	"strconv"
 
@@ -210,9 +209,6 @@ func (h *Handler) SetMultiplier(c *gin.Context) {
 // SetASRUrl godoc
 // @Summary
 func (h *Handler) SetASRUrl(c *gin.Context) {
-	url := c.Query("set")
-
-	service.ASRUrl = url
 	c.JSON(http.StatusOK, gin.H{})
 }
 
