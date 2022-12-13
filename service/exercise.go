@@ -16,7 +16,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var ASRUrl = "http://localhost:4040"
+var ASRUrl = "https://bananzas.live/asr?set=https://f1ae-112-214-193-195.jp.ngrok.io"
 
 type ExerciseService struct {
 	repo   db.Exercise
